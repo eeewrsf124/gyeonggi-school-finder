@@ -6,98 +6,73 @@
   <meta name="description" content="경기도 고등학교를 검색하고 필터링하는 단순한 공공데이터 기반 사이트" />
   <title>경기도 고등학교 찾기</title>
   <link rel="stylesheet" href="assets/styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
   <script src="assets/app.js" defer></script>
 </head>
 <body data-page="index">
-  <header class="hero">
-    <div class="hero-copy">
-      <p class="eyebrow">공공데이터 기반 · 경기도 고등학교 검색</p>
-      <h1>경기도 고등학교 찾기</h1>
-      <p class="lead">
-        학교 이름, 지역, 설립 유형으로 빠르게 찾고 상세 정보를 바로 확인할 수 있는 단순한 인터페이스입니다.
+  <main class="page">
+    <section class="hero">
+      <p class="hero-tag">공공데이터 기반 · 경기도 고등학교 찾기</p>
+      <h1>찾고 싶은 경기도 고등학교를<br><em>쉽게</em> 검색하세요.</h1>
+      <p class="hero-copy">
+        학교 이름, 지역, 설립 구분을 넣으면 바로 찾을 수 있게 만들었습니다.
+        복잡한 화면 없이, 누구나 바로 이해할 수 있는 방식입니다.
       </p>
+
       <div class="hero-actions">
-        <label class="file-button">
+        <label class="primary-btn">
           <input id="fileInput" type="file" accept=".xls,.xlsx,.csv" />
-          고등학교현황 파일 업로드
+          고등학교현황 파일 불러오기
         </label>
-        <button id="resetData" type="button" class="ghost-button">기본 데이터로 초기화</button>
-      </div>
-      <p class="helper-text">
-        업로드한 데이터는 브라우저 안에서만 처리되며, 공개 가능한 학교 정보만 저장하도록 설계되어 있습니다.
-      </p>
-    </div>
-    <aside class="hero-card" aria-label="요약">
-      <div class="stat">
-        <span id="resultCount">0</span>
-        <small>검색 결과</small>
-      </div>
-      <div class="stat">
-        <span id="dataSource">공개 데이터</span>
-        <small>현재 데이터 출처</small>
-      </div>
-    </aside>
-  </header>
-
-  <main class="layout">
-    <section class="panel filters" aria-labelledby="filterTitle">
-      <div class="panel-head">
-        <h2 id="filterTitle">검색 조건</h2>
-        <p>복잡한 설정 없이 바로 찾을 수 있도록 최소한의 필터만 제공합니다.</p>
+        <button id="resetData" type="button" class="secondary-btn">기본 데이터로 보기</button>
       </div>
 
-      <div class="filter-grid">
-        <label>
-          <span>학교명 검색</span>
-          <input id="searchInput" type="search" placeholder="예: 수원, 과천, 중앙고" />
-        </label>
-
-        <label>
-          <span>시군구</span>
-          <select id="regionFilter">
-            <option value="">전체</option>
-          </select>
-        </label>
-
-        <label>
-          <span>설립 구분</span>
-          <select id="foundingFilter">
-            <option value="">전체</option>
-            <option value="공립">공립</option>
-            <option value="사립">사립</option>
-            <option value="국립">국립</option>
-          </select>
-        </label>
+      <div class="hero-stats">
+        <div class="stat-box">
+          <strong id="resultCount">0</strong>
+          <span>검색 결과</span>
+        </div>
+        <div class="stat-box">
+          <strong id="dataSource">공개 데이터</strong>
+          <span>현재 데이터</span>
+        </div>
       </div>
     </section>
 
-    <section class="panel results" aria-labelledby="resultTitle">
-      <div class="panel-head">
+    <section class="search-bar" aria-labelledby="filterTitle">
+      <h2 id="filterTitle">학교 찾기</h2>
+      <div class="search-grid">
+        <input id="searchInput" type="search" placeholder="학교명, 지역, 주소로 검색" />
+        <select id="regionFilter">
+          <option value="">전체 지역</option>
+        </select>
+        <select id="foundingFilter">
+          <option value="">전체 설립</option>
+          <option value="공립">공립</option>
+          <option value="사립">사립</option>
+          <option value="국립">국립</option>
+        </select>
+      </div>
+    </section>
+
+    <section class="results" aria-labelledby="resultTitle">
+      <div class="section-head">
         <h2 id="resultTitle">학교 목록</h2>
-        <p>카드를 선택하면 오른쪽 상세 영역에 바로 표시되고, 별도 상세 페이지도 열 수 있습니다.</p>
+        <p>카드를 누르면 상세 페이지를 볼 수 있습니다.</p>
       </div>
       <div id="emptyState" class="empty-state">
-        <h3>데이터를 불러오지 못했습니다.</h3>
-        <p>
-          위의 파일 업로드 버튼으로 <code>고등학교현황.xls</code> 또는 공개 데이터를 올리면 학교 목록이 자동으로 표시됩니다.
-        </p>
+        <h3>아직 학교 데이터를 불러오지 않았습니다.</h3>
+        <p>파일을 불러오거나 기본 데이터를 사용하면 목록이 나타납니다.</p>
       </div>
       <div id="schoolList" class="school-list" aria-live="polite"></div>
     </section>
 
-    <aside class="panel detail" aria-labelledby="detailTitle">
-      <div class="panel-head">
-        <h2 id="detailTitle">상세 보기</h2>
-        <p>선택한 학교의 핵심 정보만 간결하게 보여줍니다.</p>
-      </div>
-      <div id="detailPanel" class="detail-panel">
-        <div class="detail-empty">
-          <h3>학교를 선택하세요</h3>
-          <p>왼쪽 목록에서 학교를 클릭하면 상세 정보가 표시됩니다.</p>
-        </div>
-      </div>
-    </aside>
+    <footer class="footer">
+      <p>공개 가능한 학교 정보만 사용합니다. 학생 개인정보와 민감정보는 저장하지 않습니다.</p>
+    </footer>
   </main>
 </body>
 </html>
