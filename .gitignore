@@ -1,0 +1,14 @@
+# Raw local school data
+*.xls
+*.xlsx
+*.csv
+*.ods
+*.tsv
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local caches
+*.log
