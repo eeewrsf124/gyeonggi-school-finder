@@ -1,16 +1,18 @@
 :root {
-  color-scheme: light;
-  --bg: #fafaf8;
-  --surface: #ffffff;
-  --line: #e7e2d9;
-  --line-strong: #cfc8be;
-  --text: #1a1a18;
-  --muted: #6b6960;
-  --hint: #9b9990;
-  --brand: #1d9e75;
-  --brand-soft: #e1f5ee;
-  --brand-dark: #0f6e56;
-  --shadow: 0 18px 48px rgba(33, 33, 30, 0.06);
+  color-scheme: dark;
+  --bg: #080b0f;
+  --surface: #0f1318;
+  --surface-2: #161c24;
+  --surface-3: #1d242f;
+  --line: #1f2937;
+  --line-strong: #2d3748;
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+  --hint: #64748b;
+  --brand: #00d48a;
+  --brand-soft: #003d28;
+  --brand-dark: #00d48a;
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
   --radius: 16px;
   --radius-sm: 10px;
 }
@@ -30,7 +32,7 @@ body {
 }
 
 body {
-  padding: 24px 16px 32px;
+  padding: 22px 16px 30px;
 }
 
 a {
@@ -57,18 +59,20 @@ select {
   justify-content: center;
   text-align: center;
   padding: 2rem 1rem;
+  position: relative;
+  overflow: hidden;
 }
 
 .hero::before {
   content: "";
   position: absolute;
-  top: -140px;
+  top: -180px;
   left: 50%;
   transform: translateX(-50%);
-  width: 680px;
-  height: 680px;
+  width: 720px;
+  height: 720px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(29, 158, 117, 0.08) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(0, 212, 138, 0.10) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -80,11 +84,12 @@ select {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--brand);
-  background: var(--brand-soft);
+  background: rgba(0, 212, 138, 0.08);
   padding: 6px 16px;
   border-radius: 999px;
   margin-bottom: 1.5rem;
   position: relative;
+  border: 1px solid rgba(0, 212, 138, 0.16);
 }
 
 .hero h1 {
@@ -133,9 +138,10 @@ select {
   overflow: hidden;
   padding: 14px 24px;
   background: var(--brand);
-  color: #fff;
+  color: #08110d;
   font-weight: 700;
   cursor: pointer;
+  border: 1px solid rgba(0, 212, 138, 0.35);
 }
 
 .primary-btn input {
@@ -160,6 +166,7 @@ select {
   margin-bottom: 14px;
   border: 1px solid var(--line);
   background: var(--surface);
+  color: var(--text);
 }
 
 .primary-btn:hover,
@@ -184,7 +191,7 @@ select {
   padding: 16px 18px;
   border-radius: 18px;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(15, 19, 24, 0.9);
   box-shadow: var(--shadow);
 }
 
@@ -205,7 +212,7 @@ select {
 
 .search-bar,
 .results {
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(15, 19, 24, 0.94);
   border: 1px solid var(--line);
   border-radius: 24px;
   box-shadow: var(--shadow);
@@ -233,7 +240,7 @@ select {
   padding: 14px 16px;
   border: 1px solid var(--line);
   border-radius: 14px;
-  background: #fff;
+  background: var(--surface-2);
   color: var(--text);
   outline: none;
 }
@@ -260,7 +267,7 @@ select {
   padding: 18px;
   border-radius: 18px;
   border: 1px dashed var(--line-strong);
-  background: #fff;
+  background: var(--surface-2);
 }
 
 .school-list {
@@ -271,13 +278,14 @@ select {
 .school-card {
   border: 1px solid var(--line);
   border-radius: 18px;
-  background: #fff;
+  background: linear-gradient(180deg, var(--surface-2) 0%, var(--surface) 100%);
   padding: 16px;
   cursor: pointer;
 }
 
 .school-card.is-selected {
-  border-color: rgba(29, 158, 117, 0.55);
+  border-color: rgba(0, 212, 138, 0.55);
+  box-shadow: 0 12px 30px rgba(0, 212, 138, 0.08);
 }
 
 .school-card-head {
@@ -305,13 +313,13 @@ select {
   padding: 6px 10px;
   border-radius: 999px;
   background: var(--brand-soft);
-  color: var(--brand-dark);
+  color: var(--brand);
   font-size: 0.86rem;
   font-weight: 700;
 }
 
 .chip.muted {
-  background: #f1f1ee;
+  background: var(--surface-3);
   color: var(--muted);
 }
 
@@ -331,7 +339,7 @@ select {
   padding: 18px;
   border-radius: 18px;
   border: 1px dashed var(--line-strong);
-  background: #fff;
+  background: var(--surface-2);
 }
 
 .detail-grid {
@@ -345,7 +353,7 @@ select {
   padding: 14px 16px;
   border-radius: 16px;
   border: 1px solid var(--line);
-  background: #fff;
+  background: var(--surface-2);
 }
 
 .detail-item span {
@@ -377,4 +385,16 @@ select {
   .school-card-head {
     flex-direction: column;
   }
+}
+
+.panel-title,
+.section-head h2,
+.search-bar h2 {
+  font-family: "Instrument Serif", serif;
+  letter-spacing: 0.01em;
+}
+
+.panel-title {
+  margin: 0 0 12px;
+  font-size: 1.7rem;
 }

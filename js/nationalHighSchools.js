@@ -1,0 +1,1 @@
+window.NATIONAL_HIGH_SCHOOLS = [];
