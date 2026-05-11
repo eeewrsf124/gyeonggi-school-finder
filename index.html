@@ -117,6 +117,18 @@
     .detail-item strong,.detail-item a{word-break:break-word}
     .homepage-link{display:inline-flex;align-items:center;gap:8px;color:var(--brand-deep);font-weight:700}
     .homepage-link::after{content:"↗";font-size:.9em;color:var(--brand)}
+    body.survey-open{overflow:hidden}
+    .survey-overlay{position:fixed;inset:0;z-index:120;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(3,7,18,.68);backdrop-filter:blur(8px)}
+    .survey-overlay.open{display:flex}
+    .survey-shell{width:min(1080px,100%);max-height:92vh;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow)}
+    .survey-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:18px 20px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--surface);z-index:1}
+    .survey-head h2{margin:0;font-family:"Instrument Serif",serif;font-size:1.8rem;font-weight:400}
+    .survey-head p{margin:4px 0 0;color:var(--muted);line-height:1.6}
+    .survey-close{min-width:40px;height:40px;border:1px solid var(--line);border-radius:12px;background:var(--surface-soft);color:var(--text);cursor:pointer}
+    .survey-body{padding:18px 20px 22px}
+    .survey-quick{display:grid;gap:12px;grid-template-columns:repeat(3,minmax(0,1fr));margin-bottom:16px}
+    .survey-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+    .survey-start-btn{display:inline-flex;align-items:center;justify-content:center;border:none;border-radius:999px;padding:13px 18px;background:var(--brand);color:#fff;font-weight:800;cursor:pointer}
     .location-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
     .search-bar{display:flex;gap:10px;flex-wrap:wrap}
     .search-input{flex:1;min-width:240px;padding:13px 16px;border:1px solid var(--line);border-radius:14px;background:#fff;outline:none}
@@ -256,15 +268,19 @@
     <section class="panel" id="quiz">
       <div class="panel-head">
         <div>
-          <h2>1, 2, 3, 4 질문</h2>
-          <p class="panel-sub">각 문항은 글자(A/B/C/D 또는 1/2/3/4)로 직접 입력할 수 있습니다.</p>
+          <h2>설문 창 열기</h2>
+          <p class="panel-sub">아래 버튼을 누르면 별도 창이 열리고, 그 안에서 설문을 풀 수 있습니다.</p>
         </div>
-        <span class="info-pill" id="quiz-progress">1 / 4</span>
+        <span class="info-pill" id="quiz-progress">0 / 12</span>
       </div>
-      <div class="quiz-grid" id="quiz-grid"></div>
-      <div class="home-start-row" style="justify-content:flex-start">
-        <button class="home-start-btn" id="calculate">추천 계산하기</button>
-        <button class="home-ghost-btn" id="reset-quiz">초기화</button>
+      <div class="survey-quick">
+        <div class="stat-card"><span class="stat-num">12</span><span class="stat-label">질문 수</span></div>
+        <div class="stat-card"><span class="stat-num">1</span><span class="stat-label">별도 설문 창</span></div>
+        <div class="stat-card"><span class="stat-num">2</span><span class="stat-label">결과로 복귀</span></div>
+      </div>
+      <div class="survey-actions">
+        <button class="survey-start-btn" id="start-quiz-inline" type="button">설문 창 열기</button>
+        <span class="panel-sub">설문은 창에서 풀고, 결과는 다시 여기서 확인합니다.</span>
       </div>
     </section>
 
@@ -319,6 +335,40 @@
       <div class="bnav-item" data-target="detail-panel"><div class="icon">📄</div><div class="label">상세</div></div>
     </div>
   </main>
+
+  <div class="survey-overlay" id="survey-overlay" aria-hidden="true">
+    <div class="survey-shell" role="dialog" aria-modal="true" aria-labelledby="survey-modal-title">
+      <div class="survey-head">
+        <div>
+          <h2 id="survey-modal-title">학교 찾기 설문조사</h2>
+          <p>이 창에서 답변을 고르고, 완료하면 결과 화면으로 돌아가 추천을 확인합니다.</p>
+        </div>
+        <button class="survey-close" id="survey-close" type="button" aria-label="설문 창 닫기">✕</button>
+      </div>
+      <div class="survey-body">
+        <div class="survey-quick">
+          <div class="stat-card"><span class="stat-num">12</span><span class="stat-label">문항</span></div>
+          <div class="stat-card"><span class="stat-num">✓</span><span class="stat-label">선택 표시</span></div>
+          <div class="stat-card"><span class="stat-num">↩</span><span class="stat-label">결과로 복귀</span></div>
+        </div>
+        <section class="panel" style="margin-top:0;">
+          <div class="panel-head">
+            <div>
+              <h2>1, 2, 3, 4 질문</h2>
+              <p class="panel-sub">각 문항은 글자(A/B/C/D 또는 1/2/3/4)로 직접 입력할 수 있습니다.</p>
+            </div>
+            <span class="info-pill" id="quiz-progress-modal">0 / 12</span>
+          </div>
+          <div class="quiz-grid" id="quiz-grid"></div>
+          <div class="home-start-row" style="justify-content:flex-start">
+            <button class="home-start-btn" id="calculate" type="button">추천 계산하기</button>
+            <button class="home-ghost-btn" id="reset-quiz" type="button">초기화</button>
+            <button class="home-ghost-btn" id="survey-close-bottom" type="button">닫고 결과 보기</button>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
 
   <script src="js/nationalHighSchools.js"></script>
   <script>
@@ -912,6 +962,30 @@
       state.search.district = districtSelect.value;
     }
 
+    function updateQuizProgress() {
+      const value = `${Object.values(state.answers).filter(Boolean).length} / ${QUESTIONS.length}`;
+      const mainProgress = el("quiz-progress");
+      const modalProgress = el("quiz-progress-modal");
+      if (mainProgress) mainProgress.textContent = value;
+      if (modalProgress) modalProgress.textContent = value;
+    }
+
+    function openSurvey() {
+      const overlay = el("survey-overlay");
+      if (!overlay) return;
+      overlay.classList.add("open");
+      document.body.classList.add("survey-open");
+      overlay.setAttribute("aria-hidden", "false");
+    }
+
+    function closeSurvey() {
+      const overlay = el("survey-overlay");
+      if (!overlay) return;
+      overlay.classList.remove("open");
+      document.body.classList.remove("survey-open");
+      overlay.setAttribute("aria-hidden", "true");
+    }
+
     function renderQuestions() {
       const grid = el("quiz-grid");
       grid.innerHTML = QUESTIONS.map((q, index) => {
@@ -942,7 +1016,7 @@
         `;
       }).join("");
 
-      el("quiz-progress").textContent = `${Object.values(state.answers).filter(Boolean).length} / ${QUESTIONS.length}`;
+      updateQuizProgress();
 
       grid.querySelectorAll("[data-set]").forEach((btn) => {
         btn.addEventListener("click", () => {
@@ -962,7 +1036,7 @@
       grid.querySelectorAll("[data-input]").forEach((input) => {
         input.addEventListener("input", (e) => {
           state.answers[e.target.dataset.input] = e.target.value.trim();
-          el("quiz-progress").textContent = `${Object.values(state.answers).filter(Boolean).length} / ${QUESTIONS.length}`;
+          updateQuizProgress();
         });
         input.addEventListener("keydown", (e) => {
           if (e.key === "Enter") {
@@ -1079,6 +1153,9 @@
           window.scrollTo({ top: document.getElementById("detail-panel").offsetTop - 8, behavior: "smooth" });
         });
       });
+
+      closeSurvey();
+      setSection("result-panel");
     }
 
     function renderSearchList() {
@@ -1122,7 +1199,7 @@
       el("detail").innerHTML = `<div class="stat-card">질문을 입력하면 상세 설명이 나타납니다.</div>`;
       el("match-pill").textContent = "대기 중";
       el("result-summary").textContent = "질문을 입력하면 추천 결과가 표시됩니다.";
-      el("quiz-progress").textContent = "0 / 12";
+      updateQuizProgress();
     }
 
     function setSection(id) {
@@ -1137,10 +1214,16 @@
     renderSearchList();
     el("detail").innerHTML = `<div class="stat-card">질문을 입력하면 상세 설명이 나타납니다.</div>`;
 
-    el("start-quiz").addEventListener("click", () => setSection("quiz"));
+    el("start-quiz").addEventListener("click", openSurvey);
+    el("start-quiz-inline").addEventListener("click", openSurvey);
     el("go-search").addEventListener("click", () => setSection("search"));
     el("calculate").addEventListener("click", calculate);
     el("reset-quiz").addEventListener("click", clearQuiz);
+    el("survey-close").addEventListener("click", closeSurvey);
+    el("survey-close-bottom").addEventListener("click", closeSurvey);
+    el("survey-overlay").addEventListener("click", (e) => {
+      if (e.target === e.currentTarget) closeSurvey();
+    });
     el("theme-toggle").addEventListener("click", () => {
       const current = document.body.getAttribute("data-theme") === "dark" ? "dark" : "light";
       setTheme(current === "dark" ? "light" : "dark");
