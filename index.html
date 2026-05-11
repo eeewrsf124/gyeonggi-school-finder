@@ -51,7 +51,7 @@
     .topnav{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 2px 18px}
     .nav-logo{font-family:"Instrument Serif",serif;font-size:1.65rem;letter-spacing:.02em}
     .nav-logo span{color:var(--brand)}
-    .nav-right{display:flex;align-items:center;gap:10px}
+    .nav-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end;max-width:100%}
     .nav-btn{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;cursor:pointer;box-shadow:var(--shadow)}
     .nav-btn:hover{transform:translateY(-1px)}
     .hero{position:relative;overflow:hidden;padding:24px 0 16px;text-align:center}
@@ -64,6 +64,12 @@
     .home-start-btn,.home-ghost-btn,.chip-btn,.school-btn,.opt-btn,.q-nav{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;border:1px solid var(--line);padding:13px 18px;background:var(--surface);color:var(--text);cursor:pointer;transition:transform .18s ease,box-shadow .18s ease,background .18s ease}
     .home-start-btn{background:var(--brand);color:#fff;border-color:transparent;font-weight:700}
     .home-start-btn:hover,.home-ghost-btn:hover,.chip-btn:hover,.school-btn:hover,.opt-btn:hover,.q-nav:hover{transform:translateY(-1px);box-shadow:var(--shadow)}
+    .layout-switch{display:flex;align-items:center;gap:8px;padding:4px;border:1px solid var(--line);border-radius:16px;background:var(--surface);box-shadow:var(--shadow)}
+    .layout-switch button{min-width:42px;height:36px;border:none;border-radius:12px;background:transparent;color:var(--muted);cursor:pointer;font-weight:800;padding:0 10px;white-space:nowrap;line-height:1}
+    .layout-switch button.active{background:rgba(29,158,117,.12);color:var(--brand-deep)}
+    .lang-switch{display:flex;align-items:center;gap:8px;padding:4px;border:1px solid var(--line);border-radius:16px;background:var(--surface);box-shadow:var(--shadow)}
+    .lang-switch button{min-width:48px;height:36px;border:none;border-radius:12px;background:transparent;color:var(--muted);cursor:pointer;font-weight:800;padding:0 10px;white-space:nowrap;line-height:1;font-size:.82rem}
+    .lang-switch button.active{background:rgba(239,68,68,.12);color:var(--danger)}
     .stats-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;max-width:860px;margin:22px auto 0}
     .stat-card{padding:16px 18px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.92);box-shadow:var(--shadow)}
     .stat-num{display:block;color:var(--brand);font-size:1.22rem;font-weight:800}
@@ -190,6 +196,20 @@
     body[data-theme="dark"] .homepage-link{color:#9ef0cf}
     body[data-theme="dark"] .toast{background:#f3f4f6;color:#111827}
     body[data-theme="dark"] .bottomnav{background:rgba(15,23,42,.92)}
+    body[data-ui="mobile"] .shell{max-width:430px}
+    body[data-ui="mobile"] .topnav{position:sticky;top:0;z-index:40;padding-top:10px;background:linear-gradient(180deg,var(--bg) 70%,transparent)}
+    body[data-ui="mobile"] .stats-row,
+    body[data-ui="mobile"] .feature-scroll,
+    body[data-ui="mobile"] .quiz-grid,
+    body[data-ui="mobile"] .results-grid,
+    body[data-ui="mobile"] .detail-grid,
+    body[data-ui="mobile"] .search-filters,
+    body[data-ui="mobile"] .survey-quick{grid-template-columns:1fr}
+    body[data-ui="mobile"] .bottomnav{position:sticky}
+    body[data-ui="desktop"] .shell{max-width:1280px}
+    body[data-ui="desktop"] .topnav{position:static}
+    body[data-ui="desktop"] .bottomnav{position:sticky}
+    body[data-ui="desktop"] .survey-shell{width:min(1180px,100%)}
     .hidden{display:none!important}
     .muted{color:var(--muted)}
     .small{font-size:12px}
@@ -205,6 +225,17 @@
     <header class="topnav">
       <div class="nav-logo">LFPY<span>.</span></div>
       <div class="nav-right">
+        <div class="layout-switch" role="group" aria-label="화면 인터페이스 선택">
+          <button type="button" data-layout="auto" title="자동">A</button>
+          <button type="button" data-layout="mobile" title="모바일">📱</button>
+          <button type="button" data-layout="desktop" title="PC">🖥️</button>
+        </div>
+        <div class="lang-switch" role="group" aria-label="언어 선택">
+          <button type="button" data-lang="ko" title="한국어">KO</button>
+          <button type="button" data-lang="en" title="English">EN</button>
+          <button type="button" data-lang="ja" title="日本語">JP</button>
+          <button type="button" data-lang="zh" title="中文">ZH</button>
+        </div>
         <button class="nav-btn" id="theme-toggle" title="다크/라이트 전환" type="button">🌙</button>
         <div class="nav-btn" id="btn-location" title="내 지역 찾기">📍</div>
         <div class="nav-btn" id="btn-info" title="정보 보기">ℹ️</div>
@@ -212,9 +243,9 @@
     </header>
 
     <section class="hero" id="home">
-      <div class="home-tag"><span style="width:6px;height:6px;border-radius:50%;background:var(--brand);display:inline-block"></span> 경기도 고등학교 AI 추천</div>
-      <h1>Let's find<br>the place<br><em>you want.</em></h1>
-      <p class="home-sub">
+      <div class="home-tag" id="home-tag-text"><span style="width:6px;height:6px;border-radius:50%;background:var(--brand);display:inline-block"></span> 경기도 고등학교 AI 추천</div>
+      <h1 id="hero-title">Let's find<br>the place<br><em>you want.</em></h1>
+      <p class="home-sub" id="hero-sub">
         전국 고등학교 공공데이터를 바탕으로 학교를 비교하고, 답변은 직접 글자로 입력할 수 있도록 만들었습니다.
         관리자 모드는 제거했고, 학생용 추천 흐름만 남겼습니다.
       </p>
@@ -223,17 +254,17 @@
         <button class="home-ghost-btn" id="go-search">학교 탐색하기</button>
       </div>
       <div class="stats-row">
-        <div class="stat-card"><span class="stat-num" id="school-count">2348</span><span class="stat-label">전국 고등학교</span></div>
-        <div class="stat-card"><span class="stat-num">4</span><span class="stat-label">핵심 질문</span></div>
-        <div class="stat-card"><span class="stat-num">0</span><span class="stat-label">개인정보 저장 없음</span></div>
+        <div class="stat-card"><span class="stat-num" id="school-count">2348</span><span class="stat-label" id="stat-school-label">전국 고등학교</span></div>
+        <div class="stat-card"><span class="stat-num">12</span><span class="stat-label" id="stat-question-label">핵심 질문</span></div>
+        <div class="stat-card"><span class="stat-num">0</span><span class="stat-label" id="stat-private-label">개인정보 저장 없음</span></div>
       </div>
     </section>
 
     <section class="panel" id="location-panel">
       <div class="panel-head">
         <div>
-          <h2>내 지역 찾기</h2>
-          <p class="panel-sub">버튼을 누르면 현재 위치를 읽고, 추정 시도와 행정구를 화면에 보여줍니다.</p>
+          <h2 id="location-title">내 지역 찾기</h2>
+          <p class="panel-sub" id="location-sub">버튼을 누르면 현재 위치를 읽고, 추정 시도와 행정구를 화면에 보여줍니다.</p>
         </div>
         <span class="info-pill" id="location-status">아직 확인 전</span>
       </div>
@@ -268,8 +299,8 @@
     <section class="panel" id="quiz">
       <div class="panel-head">
         <div>
-          <h2>설문 창 열기</h2>
-          <p class="panel-sub">아래 버튼을 누르면 별도 창이 열리고, 그 안에서 설문을 풀 수 있습니다.</p>
+          <h2 id="survey-panel-title">설문 창 열기</h2>
+          <p class="panel-sub" id="survey-panel-sub">아래 버튼을 누르면 별도 창이 열리고, 그 안에서 설문을 풀 수 있습니다.</p>
         </div>
         <span class="info-pill" id="quiz-progress">0 / 12</span>
       </div>
@@ -280,14 +311,14 @@
       </div>
       <div class="survey-actions">
         <button class="survey-start-btn" id="start-quiz-inline" type="button">설문 창 열기</button>
-        <span class="panel-sub">설문은 창에서 풀고, 결과는 다시 여기서 확인합니다.</span>
+        <span class="panel-sub" id="survey-inline-note">설문은 창에서 풀고, 결과는 다시 여기서 확인합니다.</span>
       </div>
     </section>
 
     <section class="panel" id="result-panel">
       <div class="panel-head">
         <div>
-          <h2>추천 결과 TOP 3</h2>
+          <h2 id="result-title">추천 결과 TOP 3</h2>
           <p class="panel-sub" id="result-summary">질문을 입력하면 추천 결과가 표시됩니다.</p>
         </div>
         <span class="info-pill" id="match-pill">대기 중</span>
@@ -298,8 +329,8 @@
     <section class="detail-panel" id="detail-panel">
       <div class="panel-head">
         <div>
-          <h3>선택한 학교 상세</h3>
-          <p class="panel-sub">공공데이터에서 읽을 수 있는 사실만 보여줍니다.</p>
+          <h3 id="detail-title">선택한 학교 상세</h3>
+          <p class="panel-sub" id="detail-sub">공공데이터에서 읽을 수 있는 사실만 보여줍니다.</p>
         </div>
       </div>
       <div id="detail"></div>
@@ -308,8 +339,8 @@
     <section class="panel" id="search">
       <div class="panel-head">
         <div>
-          <h2>학교 탐색</h2>
-          <p class="panel-sub">학교 이름, 시도, 행정구, 주소, 유형으로 직접 찾아볼 수 있습니다.</p>
+          <h2 id="search-title">학교 탐색</h2>
+          <p class="panel-sub" id="search-sub">학교 이름, 시도, 행정구, 주소, 유형으로 직접 찾아볼 수 있습니다.</p>
         </div>
       </div>
       <div class="search-bar">
@@ -341,7 +372,7 @@
       <div class="survey-head">
         <div>
           <h2 id="survey-modal-title">학교 찾기 설문조사</h2>
-          <p>이 창에서 답변을 고르고, 완료하면 결과 화면으로 돌아가 추천을 확인합니다.</p>
+          <p id="survey-modal-sub">이 창에서 답변을 고르고, 완료하면 결과 화면으로 돌아가 추천을 확인합니다.</p>
         </div>
         <button class="survey-close" id="survey-close" type="button" aria-label="설문 창 닫기">✕</button>
       </div>
@@ -354,8 +385,8 @@
         <section class="panel" style="margin-top:0;">
           <div class="panel-head">
             <div>
-              <h2>1, 2, 3, 4 질문</h2>
-              <p class="panel-sub">각 문항은 글자(A/B/C/D 또는 1/2/3/4)로 직접 입력할 수 있습니다.</p>
+              <h2 id="quiz-modal-title">12개 질문</h2>
+              <p class="panel-sub" id="quiz-modal-sub">각 문항은 글자(A/B/C/D 또는 1/2/3/4)로 직접 입력할 수 있습니다.</p>
             </div>
             <span class="info-pill" id="quiz-progress-modal">0 / 12</span>
           </div>
@@ -555,7 +586,10 @@
     const state = {
       answers: { gender: "", type: "", priority: "", founding: "", region: "", distance: "", study: "", activity: "", major: "", occupation: "", keyword: "", note: "" },
       search: { query: "", city: "", district: "", founding: "" },
+      layoutMode: "auto",
+      language: "ko",
       selectedSchool: null,
+      lastRecommendations: [],
       location: null,
       locationLabel: "",
       locationCity: "",
@@ -564,15 +598,248 @@
     const el = (id) => document.getElementById(id);
 
     const THEME_KEY = "lfpy_theme";
+    const LAYOUT_KEY = "lfpy_layout";
+    const LANGUAGE_KEY = "lfpy_language";
     const LIVE_SCHOOL_CACHE = new Map();
+
+    const UI_TEXT = {
+      ko: {
+        homeTag: "경기도 고등학교 AI 추천",
+        heroTitle: "Let's find<br>the place<br><em>you want.</em>",
+        heroSub: "전국 고등학교 공공데이터를 바탕으로 학교를 비교하고, 답변은 직접 글자로 입력할 수 있도록 만들었습니다. 관리자 모드는 제거했고, 학생용 추천 흐름만 남겼습니다.",
+        startQuiz: "질문 시작하기 →",
+        goSearch: "학교 탐색하기",
+        statSchool: "전국 고등학교",
+        statQuestion: "핵심 질문",
+        statPrivate: "개인정보 저장 없음",
+        locationTitle: "내 지역 찾기",
+        locationSub: "버튼을 누르면 현재 위치를 읽고, 추정 시도와 행정구를 화면에 보여줍니다.",
+        surveyPanelTitle: "설문 창 열기",
+        surveyPanelSub: "아래 버튼을 누르면 별도 창이 열리고, 그 안에서 설문을 풀 수 있습니다.",
+        surveyInlineNote: "설문은 창에서 풀고, 결과는 다시 여기서 확인합니다.",
+        resultTitle: "추천 결과 TOP 3",
+        resultSummary: "질문을 입력하면 추천 결과가 표시됩니다.",
+        detailTitle: "선택한 학교 상세",
+        detailSub: "공공데이터에서 읽을 수 있는 사실만 보여줍니다.",
+        searchTitle: "학교 탐색",
+        searchSub: "학교 이름, 시도, 행정구, 주소, 유형으로 직접 찾아볼 수 있습니다.",
+        searchPlaceholder: "예: 수원, 개포, 강남, 개포고등학교...",
+        searchAllCity: "시도 전체",
+        searchAllDistrict: "행정구 전체",
+        searchAllFounding: "설립구분 전체",
+        surveyModalTitle: "학교 찾기 설문조사",
+        surveyModalSub: "이 창에서 답변을 고르고, 완료하면 결과 화면으로 돌아가 추천을 확인합니다.",
+        surveyOpen: "설문 창 열기",
+        calculate: "추천 계산하기",
+        reset: "초기화",
+        closeAndSee: "닫고 결과 보기",
+        searchClear: "초기화",
+        quizPanelHeading: "12개 질문",
+        quizPanelSub: "각 문항은 글자(A/B/C/D 또는 1/2/3/4)로 직접 입력할 수 있습니다.",
+        quizHelp: "직접 A/B/C/D 중 하나를 입력해도 되고, 아래 버튼을 눌러도 됩니다.",
+        quizProgress: "0 / 12",
+        resultEmpty: "질문을 입력하면 추천 결과가 표시됩니다.",
+        detailEmpty: "질문을 입력하면 상세 설명이 나타납니다.",
+        waiting: "대기 중",
+        quickCards: ["12", "1", "2"],
+        quickLabels: ["질문 수", "별도 설문 창", "결과로 복귀"],
+        clearQuestion: "지우기"
+      },
+      en: {
+        homeTag: "Gyeonggi High School AI Guide",
+        heroTitle: "Let's find<br>the place<br><em>you want.</em>",
+        heroSub: "Compare Korean high schools using public data. Answers can be typed directly. The admin mode was removed; only the student recommendation flow remains.",
+        startQuiz: "Start questions →",
+        goSearch: "Browse schools",
+        statSchool: "High schools nationwide",
+        statQuestion: "Core questions",
+        statPrivate: "No personal data stored",
+        locationTitle: "Find my area",
+        locationSub: "Press the button to read your current location and show the estimated city and district.",
+        surveyPanelTitle: "Open survey window",
+        surveyPanelSub: "Press the button below to open a separate window and answer the survey there.",
+        surveyInlineNote: "Fill out the survey in the window, then come back here to see the results.",
+        resultTitle: "Top 3 recommendations",
+        resultSummary: "Enter answers to see recommendations.",
+        detailTitle: "Selected school details",
+        detailSub: "Only facts that can be read from public data are shown.",
+        searchTitle: "School search",
+        searchSub: "Search by school name, city/province, district, address, or type.",
+        searchPlaceholder: "e.g. Suwon, Gaepo, Gangnam, Gaepo High School...",
+        searchAllCity: "All cities/provinces",
+        searchAllDistrict: "All districts",
+        searchAllFounding: "All founding types",
+        surveyModalTitle: "School search survey",
+        surveyModalSub: "Choose answers in this window, then return to the results screen to review recommendations.",
+        surveyOpen: "Open survey window",
+        calculate: "Calculate recommendations",
+        reset: "Reset",
+        closeAndSee: "Close and see results",
+        searchClear: "Reset",
+        quizPanelHeading: "12 questions",
+        quizPanelSub: "Each question can be answered by typing A/B/C/D or 1/2/3/4 directly.",
+        quizHelp: "You can type A/B/C/D directly, or press one of the buttons below.",
+        quizProgress: "0 / 12",
+        resultEmpty: "Enter answers to see recommendations.",
+        detailEmpty: "Enter answers to see details.",
+        waiting: "Waiting",
+        quickCards: ["12", "1", "2"],
+        quickLabels: ["Questions", "Separate survey window", "Back to results"],
+        clearQuestion: "Clear"
+      },
+      ja: {
+        homeTag: "京畿道高校 AI レコメンド",
+        heroTitle: "Let's find<br>the place<br><em>you want.</em>",
+        heroSub: "公的データを使って韓国の高校を比較します。回答は直接入力できます。管理者モードは削除し、学生向けの流れだけを残しました。",
+        startQuiz: "質問を始める →",
+        goSearch: "学校を見る",
+        statSchool: "全国の高校",
+        statQuestion: "主要質問",
+        statPrivate: "個人情報は保存しません",
+        locationTitle: "地域を探す",
+        locationSub: "ボタンを押すと現在地を読み取り、推定された市道と区を表示します。",
+        surveyPanelTitle: "アンケートを開く",
+        surveyPanelSub: "下のボタンを押すと別ウィンドウが開き、その中でアンケートに答えられます。",
+        surveyInlineNote: "ウィンドウで回答して、ここに戻って結果を確認します。",
+        resultTitle: "おすすめ TOP 3",
+        resultSummary: "回答を入力するとおすすめが表示されます。",
+        detailTitle: "選択した学校の詳細",
+        detailSub: "公的データから読める事実だけを表示します。",
+        searchTitle: "学校検索",
+        searchSub: "学校名、市道、区、住所、種類で直接探せます。",
+        searchPlaceholder: "例: 水原、開浦、江南、開浦高校...",
+        searchAllCity: "市道 全体",
+        searchAllDistrict: "行政区 全体",
+        searchAllFounding: "設立区分 全体",
+        surveyModalTitle: "学校探しアンケート",
+        surveyModalSub: "このウィンドウで回答し、完了後に結果画面へ戻っておすすめを確認します。",
+        surveyOpen: "アンケートを開く",
+        calculate: "おすすめを計算",
+        reset: "リセット",
+        closeAndSee: "閉じて結果を見る",
+        searchClear: "リセット",
+        quizPanelHeading: "12の質問",
+        quizPanelSub: "各質問は A/B/C/D または 1/2/3/4 をそのまま入力できます。",
+        quizHelp: "A/B/C/D を直接入力しても、下のボタンを押しても大丈夫です。",
+        quizProgress: "0 / 12",
+        resultEmpty: "回答を入力するとおすすめが表示されます。",
+        detailEmpty: "回答を入力すると詳細が表示されます。",
+        waiting: "待機中",
+        quickCards: ["12", "1", "2"],
+        quickLabels: ["質問数", "別ウィンドウ", "結果に戻る"],
+        clearQuestion: "消す"
+      },
+      zh: {
+        homeTag: "京畿道高中 AI 推荐",
+        heroTitle: "Let's find<br>the place<br><em>you want.</em>",
+        heroSub: "基于韩国高中的公共数据进行比较。答案可以直接输入。管理员模式已移除，只保留学生推荐流程。",
+        startQuiz: "开始答题 →",
+        goSearch: "浏览学校",
+        statSchool: "全国高中",
+        statQuestion: "核心问题",
+        statPrivate: "不保存个人信息",
+        locationTitle: "查找我的区域",
+        locationSub: "按下按钮后读取当前位置，并显示推测的市道和行政区。",
+        surveyPanelTitle: "打开问卷窗口",
+        surveyPanelSub: "点击下方按钮会打开一个独立窗口，在其中完成问卷。",
+        surveyInlineNote: "在窗口里完成问卷，然后返回这里查看结果。",
+        resultTitle: "推荐前 3 名",
+        resultSummary: "输入答案后会显示推荐结果。",
+        detailTitle: "所选学校详情",
+        detailSub: "只显示能从公共数据中读取的事实。",
+        searchTitle: "学校搜索",
+        searchSub: "可按学校名称、城市/区、地址和类型搜索。",
+        searchPlaceholder: "例如：水原、开浦、江南、开浦高中...",
+        searchAllCity: "市道全部",
+        searchAllDistrict: "行政区全部",
+        searchAllFounding: "办学类型全部",
+        surveyModalTitle: "学校搜索问卷",
+        surveyModalSub: "在这个窗口中选择答案，完成后返回结果页查看推荐。",
+        surveyOpen: "打开问卷窗口",
+        calculate: "计算推荐",
+        reset: "重置",
+        closeAndSee: "关闭并查看结果",
+        searchClear: "重置",
+        quizPanelHeading: "12 个问题",
+        quizPanelSub: "每个问题都可以直接输入 A/B/C/D 或 1/2/3/4。",
+        quizHelp: "可以直接输入 A/B/C/D，也可以点击下面的按钮。",
+        quizProgress: "0 / 12",
+        resultEmpty: "输入答案后会显示推荐结果。",
+        detailEmpty: "输入答案后会显示详细信息。",
+        waiting: "等待中",
+        quickCards: ["12", "1", "2"],
+        quickLabels: ["问题数", "独立问卷窗口", "回到结果"],
+        clearQuestion: "清除",
+      }
+    };
+
+    const QUESTION_I18N = {
+      ko: {
+        gender: { title: "성별은?", desc: "설문 흐름을 위한 첫 질문입니다. 추천 계산에는 직접 쓰지 않습니다.", placeholder: "예: A", options: ["남자", "여자", "응답 안함", "비공개"] },
+        type: { title: "원하는 학교 유형은?", desc: "가장 먼저 학교의 방향을 정합니다. 사실 기반으로만 매칭합니다.", placeholder: "예: A", options: ["일반고", "외국어·국제고", "과학고·마이스터고", "예술·체육·특성화고"] },
+        priority: { title: "가장 중요한 기준은?", desc: "조건을 하나 더 구체화하면 추천의 전달력이 좋아집니다.", placeholder: "예: B", options: ["진학 중심", "프로그램 다양성", "통학거리", "특기·전공"] },
+        founding: { title: "희망 설립 구분은?", desc: "공립·사립 선호는 실제 학교 데이터의 공공 정보로 비교합니다.", placeholder: "예: A", options: ["공립", "사립", "상관없음", "비교해보기"] },
+        region: { title: "희망 지역은 어디인가요?", desc: "시도 단위로 먼저 좁히면 탐색이 훨씬 쉬워집니다.", placeholder: "예: A", options: ["수도권", "충청권", "호남권", "영남권"] },
+        distance: { title: "통학 거리는 어느 정도가 좋나요?", desc: "현실적인 통학 조건을 반영하면 추천 정확도가 올라갑니다.", placeholder: "예: B", options: ["아주 가까움", "보통", "조금 멀어도 됨", "상관없음"] },
+        study: { title: "학업 분위기는 어떤 쪽이 좋나요?", desc: "학교의 공개 키워드를 바탕으로 분위기를 해석합니다.", placeholder: "예: A", options: ["진학 중심", "균형형", "프로그램형", "자율형"] },
+        activity: { title: "활동 성향은 어떤 편인가요?", desc: "동아리, 프로젝트, 대회 같은 공개 키워드를 참고합니다.", placeholder: "예: B", options: ["동아리 중심", "프로젝트 중심", "대회 중심", "조용한 환경"] },
+        major: { title: "원하는 진로 분야는?", desc: "직접 분야를 고르면 추천 설명이 더 구체적이 됩니다.", placeholder: "예: AI", options: ["AI·IT", "인문·사회", "예술·디자인", "국제·외국어"] },
+        occupation: { title: "나의 직업은 무엇인가요?", desc: "나중에 희망 직업을 기준으로 학교 설명을 읽기 쉽게 맞춥니다.", placeholder: "예: 디자이너", options: ["공학자", "의사", "디자이너", "교사"] },
+        keyword: { title: "추가로 보고 싶은 키워드는?", desc: "직접 글자를 써서 입력하세요. 예: AI, 진로, 예술, 국제", placeholder: "예: AI", options: ["AI", "진로", "예술", "국제"] },
+        note: { title: "마지막으로 남길 조건은?", desc: "한 줄로 적으면 추천 설명을 읽는 사람이 이해하기 쉬워집니다.", placeholder: "예: 조용한 학교", options: ["조용한 학교", "활동 많은 학교", "진학 잘하는 학교", "상세 조건 직접 입력"] }
+      },
+      en: {
+        gender: { title: "Gender?", desc: "This is the first question for the flow. It is not used directly in scoring.", placeholder: "e.g. A", options: ["Male", "Female", "Prefer not to say", "Private"] },
+        type: { title: "Preferred school type?", desc: "We first define the school direction. Matching uses only factual data.", placeholder: "e.g. A", options: ["General high school", "Foreign/International", "Science/Meister", "Arts/Specialized"] },
+        priority: { title: "What matters most?", desc: "A more specific condition makes the recommendation easier to read.", placeholder: "e.g. B", options: ["Admission focus", "Program variety", "Commute distance", "Specialty/major"] },
+        founding: { title: "Preferred founding type?", desc: "Public vs private preferences are compared using public school data.", placeholder: "e.g. A", options: ["Public", "Private", "No preference", "Compare"] },
+        region: { title: "Which region do you want?", desc: "Narrowing by province/city first makes browsing easier.", placeholder: "e.g. A", options: ["Capital area", "Central", "Southwest", "Southeast"] },
+        distance: { title: "How far can you commute?", desc: "Realistic commute conditions improve recommendation accuracy.", placeholder: "e.g. B", options: ["Very close", "Normal", "A bit farther is okay", "No preference"] },
+        study: { title: "What kind of academic atmosphere do you want?", desc: "We interpret the atmosphere from public school keywords.", placeholder: "e.g. A", options: ["Admission oriented", "Balanced", "Program oriented", "Autonomous"] },
+        activity: { title: "What is your activity style?", desc: "We use public keywords such as clubs, projects, and contests.", placeholder: "e.g. B", options: ["Club focused", "Project focused", "Contest focused", "Quiet environment"] },
+        major: { title: "Which career field do you want?", desc: "Choosing a field makes the recommendation explanation more specific.", placeholder: "e.g. AI", options: ["AI/IT", "Humanities/Social", "Art/Design", "International/Languages"] },
+        occupation: { title: "What is your dream job?", desc: "We use your dream job later to make the school explanation easier to read.", placeholder: "e.g. Designer", options: ["Engineer", "Doctor", "Designer", "Teacher"] },
+        keyword: { title: "Any extra keyword?", desc: "Type directly, for example: AI, career, art, international.", placeholder: "e.g. AI", options: ["AI", "Career", "Art", "International"] },
+        note: { title: "Any final condition?", desc: "A short note makes the recommendation easier to understand.", placeholder: "e.g. quiet school", options: ["Quiet school", "Active school", "Strong admission school", "Custom input"] }
+      },
+      ja: {
+        gender: { title: "性別は？", desc: "流れのための最初の質問です。スコアには直接使いません。", placeholder: "例: A", options: ["男性", "女性", "回答しない", "非公開"] },
+        type: { title: "希望する学校の種類は？", desc: "まず学校の方向性を決めます。事実ベースでのみ一致させます。", placeholder: "例: A", options: ["普通高校", "外国語・国際", "科学・マイスター", "芸術・専門"] },
+        priority: { title: "最も大事な基準は？", desc: "条件を少し具体化すると、推薦の見やすさが上がります。", placeholder: "例: B", options: ["進学重視", "プログラム多様性", "通学距離", "特技・専攻"] },
+        founding: { title: "希望する設立区分は？", desc: "公立・私立の好みは公開データで比較します。", placeholder: "例: A", options: ["公立", "私立", "こだわらない", "比較する"] },
+        region: { title: "希望地域はどこですか？", desc: "まず都道府県/市道で絞ると探しやすくなります。", placeholder: "例: A", options: ["首都圏", "中部", "南西", "南東"] },
+        distance: { title: "通学距離はどれくらいが良いですか？", desc: "現実的な通学条件を反映すると精度が上がります。", placeholder: "例: B", options: ["とても近い", "普通", "少し遠くても可", "こだわらない"] },
+        study: { title: "学習の雰囲気はどれが良いですか？", desc: "公開キーワードから雰囲気を読み取ります。", placeholder: "例: A", options: ["進学重視", "バランス型", "プログラム型", "自主性重視"] },
+        activity: { title: "活動の傾向は？", desc: "部活、プロジェクト、大会などの公開キーワードを参考にします。", placeholder: "例: B", options: ["部活中心", "プロジェクト中心", "大会中心", "静かな環境"] },
+        major: { title: "希望する進路分野は？", desc: "分野を選ぶと推薦説明がより具体的になります。", placeholder: "例: AI", options: ["AI・IT", "文系・社会", "芸術・デザイン", "国際・語学"] },
+        occupation: { title: "あなたの職業は？", desc: "希望職業を後で分かりやすく説明に反映します。", placeholder: "例: デザイナー", options: ["エンジニア", "医師", "デザイナー", "教師"] },
+        keyword: { title: "追加で見たいキーワードは？", desc: "直接入力してください。例: AI, 進路, 芸術, 国際", placeholder: "例: AI", options: ["AI", "進路", "芸術", "国際"] },
+        note: { title: "最後に残したい条件は？", desc: "一言メモがあると、推薦の説明が分かりやすくなります。", placeholder: "例: 静かな学校", options: ["静かな学校", "活動が多い学校", "進学に強い学校", "詳細条件を入力"] }
+      },
+      zh: {
+        gender: { title: "性别？", desc: "这是流程的第一个问题，不直接用于评分。", placeholder: "例如 A", options: ["男", "女", "不回答", "保密"] },
+        type: { title: "想要的学校类型？", desc: "先确定学校方向，推荐仅基于事实数据。", placeholder: "例如 A", options: ["普通高中", "外语/国际", "科学/Meister", "艺术/专门"] },
+        priority: { title: "最重要的标准是什么？", desc: "把条件说得更具体，推荐会更容易理解。", placeholder: "例如 B", options: ["升学优先", "项目多样", "通勤距离", "特长/专业"] },
+        founding: { title: "希望的办学类型？", desc: "公立/私立偏好会根据公开数据进行比较。", placeholder: "例如 A", options: ["公立", "私立", "无所谓", "对比"] },
+        region: { title: "想要哪个地区？", desc: "先按省市缩小范围会更容易查找。", placeholder: "例如 A", options: ["首都圈", "中部", "西南", "东南"] },
+        distance: { title: "通勤距离希望多远？", desc: "现实的通勤条件会提高推荐准确度。", placeholder: "例如 B", options: ["非常近", "一般", "稍远也可以", "无所谓"] },
+        study: { title: "想要什么样的学习氛围？", desc: "我们会根据学校公开关键词来判断。", placeholder: "例如 A", options: ["升学导向", "均衡型", "项目型", "自主型"] },
+        activity: { title: "活动风格偏好？", desc: "参考社团、项目、竞赛等公开关键词。", placeholder: "例如 B", options: ["社团为主", "项目为主", "竞赛为主", "安静环境"] },
+        major: { title: "想要的升学方向？", desc: "选择方向后，推荐说明会更具体。", placeholder: "例如 AI", options: ["AI/IT", "文史社科", "艺术/设计", "国际/语言"] },
+        occupation: { title: "你的职业是什么？", desc: "我们会把你的理想职业反映到推荐说明里。", placeholder: "例如 设计师", options: ["工程师", "医生", "设计师", "教师"] },
+        keyword: { title: "想额外看的关键词？", desc: "可以直接输入，例如：AI、升学、艺术、国际。", placeholder: "例如 AI", options: ["AI", "升学", "艺术", "国际"] },
+        note: { title: "最后想保留的条件？", desc: "一句备注会让推荐说明更容易理解。", placeholder: "例如 安静的学校", options: ["安静的学校", "活动多的学校", "升学强的学校", "自定义输入"] }
+      }
+    };
     function setTheme(theme) {
       const next = theme === "dark" ? "dark" : "light";
       document.body.setAttribute("data-theme", next);
       localStorage.setItem(THEME_KEY, next);
       const toggle = el("theme-toggle");
       if (toggle) {
+        const L = getUiLabels(state.language);
         toggle.textContent = next === "dark" ? "☀️" : "🌙";
-        toggle.title = next === "dark" ? "라이트 모드로 전환" : "다크 모드로 전환";
+        toggle.title = next === "dark" ? L.themeLight : L.themeDark;
         toggle.setAttribute("aria-label", toggle.title);
       }
       return next;
@@ -584,12 +851,351 @@
       setTheme(preferred);
     }
 
+    function getPreferredLayoutMode(mode) {
+      if (mode === "mobile" || mode === "desktop") return mode;
+      return window.matchMedia && window.matchMedia("(max-width: 980px)").matches ? "mobile" : "desktop";
+    }
+
+    function updateLayoutSwitch() {
+      document.querySelectorAll("[data-layout]").forEach((btn) => {
+        const active = btn.dataset.layout === state.layoutMode;
+        btn.classList.toggle("active", active);
+        btn.setAttribute("aria-pressed", active ? "true" : "false");
+      });
+    }
+
+    function applyLayoutMode(mode, persist = true) {
+      const next = mode === "auto" ? "auto" : (mode === "mobile" || mode === "desktop" ? mode : "auto");
+      state.layoutMode = next;
+      const effective = getPreferredLayoutMode(next);
+      document.body.setAttribute("data-ui", effective);
+      document.body.dataset.layoutMode = next;
+      if (persist) localStorage.setItem(LAYOUT_KEY, next);
+      updateLayoutSwitch();
+      return effective;
+    }
+
+    function initLayoutMode() {
+      const stored = localStorage.getItem(LAYOUT_KEY) || "auto";
+      applyLayoutMode(stored, false);
+      window.addEventListener("resize", () => {
+        if (state.layoutMode === "auto") applyLayoutMode("auto", false);
+      });
+    }
+
+    function updateLanguageSwitch() {
+      document.querySelectorAll("[data-lang]").forEach((btn) => {
+        const active = btn.dataset.lang === state.language;
+        btn.classList.toggle("active", active);
+        btn.setAttribute("aria-pressed", active ? "true" : "false");
+      });
+    }
+
+    function getLocalizedQuestions(lang) {
+      const locale = QUESTION_I18N[lang] || QUESTION_I18N.ko;
+      return QUESTIONS.map((question) => {
+        const patch = locale[question.id] || {};
+        return {
+          ...question,
+          title: patch.title || question.title,
+          desc: patch.desc || question.desc,
+          placeholder: patch.placeholder || question.placeholder,
+          options: question.options.map((option, index) => ({
+            ...option,
+            label: patch.options?.[index] || option.label,
+          })),
+        };
+      });
+    }
+
+    function applyLanguage(lang, persist = true) {
+      const next = UI_TEXT[lang] ? lang : "ko";
+      state.language = next;
+      document.documentElement.lang = next;
+      document.body.dataset.language = next;
+      if (persist) localStorage.setItem(LANGUAGE_KEY, next);
+      updateLanguageSwitch();
+      setTheme(document.body.getAttribute("data-theme") === "dark" ? "dark" : "light");
+
+      const t = UI_TEXT[next];
+      el("home-tag-text").innerHTML = `<span style="width:6px;height:6px;border-radius:50%;background:var(--brand);display:inline-block"></span> ${t.homeTag}`;
+      el("hero-title").innerHTML = t.heroTitle;
+      el("hero-sub").textContent = t.heroSub;
+      el("start-quiz").textContent = t.startQuiz;
+      el("go-search").textContent = t.goSearch;
+      el("stat-school-label").textContent = t.statSchool;
+      el("stat-question-label").textContent = t.statQuestion;
+      el("stat-private-label").textContent = t.statPrivate;
+      el("location-title").textContent = t.locationTitle;
+      el("location-sub").textContent = t.locationSub;
+      el("survey-panel-title").textContent = t.surveyPanelTitle;
+      el("survey-panel-sub").textContent = t.surveyPanelSub;
+      el("survey-inline-note").textContent = t.surveyInlineNote;
+      el("result-title").textContent = t.resultTitle;
+      el("result-summary").textContent = t.resultSummary;
+      el("detail-title").textContent = t.detailTitle;
+      el("detail-sub").textContent = t.detailSub;
+      el("search-title").textContent = t.searchTitle;
+      el("search-sub").textContent = t.searchSub;
+      el("search-input").placeholder = t.searchPlaceholder;
+      el("survey-modal-title").textContent = t.surveyModalTitle;
+      el("survey-modal-sub").textContent = t.surveyModalSub;
+      el("quiz-modal-title").textContent = t.quizPanelHeading;
+      el("quiz-modal-sub").textContent = t.quizPanelSub;
+      el("start-quiz-inline").textContent = t.surveyOpen;
+      el("survey-close").title = next === "ko" ? "설문 창 닫기" : (next === "en" ? "Close survey window" : next === "ja" ? "アンケートを閉じる" : "关闭问卷窗口");
+      el("survey-close-bottom").textContent = t.closeAndSee;
+      el("calculate").textContent = t.calculate;
+      el("reset-quiz").textContent = t.reset;
+      el("search-clear").textContent = t.searchClear;
+      el("quiz-progress").textContent = t.quizProgress;
+      el("quiz-progress-modal").textContent = t.quizProgress;
+      populateSearchFilters();
+      renderQuestions();
+      renderSearchList();
+      if (state.lastRecommendations.length) {
+        renderRecommendations(state.lastRecommendations);
+      } else if (state.selectedSchool) {
+        renderSchoolDetail(state.selectedSchool, null);
+      }
+      if (!state.selectedSchool) {
+        el("detail").innerHTML = `<div class="stat-card">${t.detailEmpty}</div>`;
+      }
+      const resultEmpty = t.resultEmpty;
+      const resultSummary = el("result-summary");
+      if (!el("results").innerHTML) resultSummary.textContent = resultEmpty;
+    }
+
     function showToast(msg) {
       const toast = el("toast");
       toast.textContent = msg;
       toast.classList.add("show");
       clearTimeout(showToast._t);
       showToast._t = setTimeout(() => toast.classList.remove("show"), 1800);
+    }
+
+    function getUiLabels(lang) {
+      const packs = {
+        ko: {
+          detailFields: { name: "학교명", founding: "설립 구분", type: "학교 유형", region: "지역", address: "주소", homepage: "홈페이지", reason: "추천 이유", keywords: "공개 키워드", status: "상태" },
+          detailStatus: "NEIS 최신 정보 확인 후 표시됩니다.",
+          noHomepage: "홈페이지 없음",
+          openHomepage: "홈페이지 열기",
+          noSchool: "학교를 선택하세요.",
+          noInfo: "정보 없음",
+          noAddress: "주소 없음",
+          searchEmpty: "검색 결과가 없습니다. 학교 이름, 시도, 행정구, 주소를 바꿔서 다시 검색해 보세요.",
+          searchDataLabel: "공공데이터",
+          missingCity: "시도 정보 없음",
+          missingDistrict: "행정구 정보 없음",
+          summaryEmpty: "검색 조건을 선택하면 전국 고등학교를 빠르게 좁힐 수 있습니다.",
+          summaryFiltered: "기준으로 필터링 중입니다.",
+          summaryHint: "시도 선택 시 행정구 목록이 자동으로 좁혀집니다.",
+          summaryCount: "건이 남았습니다.",
+          resultDetails: "상세 보기",
+          matchLabel: "매칭",
+          themeLight: "라이트 모드로 전환",
+          themeDark: "다크 모드로 전환",
+          location: {
+            prompt: "버튼을 눌러 확인하세요.",
+            coords: "-",
+            city: "-",
+            district: "-",
+            count: "-",
+            hint: "위치를 읽으면 자동으로 좁혀집니다.",
+            checking: "현재 위치를 확인하는 중입니다.",
+            checkingStatus: "확인 중",
+            doneStatus: "완료",
+            failStatus: "실패",
+            success: "현재 위치와 내 지역을 찾았습니다.",
+            noSupport: "이 브라우저는 위치 정보를 지원하지 않습니다.",
+            fail: "현재 위치를 불러왔지만 상세 지역명은 가져오지 못했습니다.",
+            cityHint: (city) => `현재 ${city} 기준으로 학교 목록이 맞춰졌습니다.`,
+            countHint: "현재 위치를 찾으면 지역 학교 수가 표시됩니다.",
+          },
+          searchSummaryPrefix: "검색어",
+          searchSummaryCity: "시도",
+          searchSummaryDistrict: "행정구",
+          searchSummaryFounding: "설립구분",
+          searchSummaryBuilding: "기준으로 필터링 중입니다.",
+          searchSummaryNoSelection: "시도 전체",
+          searchSummaryAllDistricts: "행정구 전체",
+          searchSummaryAllFounding: "설립구분 전체",
+          infoToast: "부가 분석 화면은 제거했습니다. 학생 추천만 남겼습니다.",
+          initDetail: "질문을 입력하면 상세 설명이 나타납니다.",
+          emptyResultSummary: "질문을 입력하면 추천 결과가 표시됩니다.",
+        },
+        en: {
+          detailFields: { name: "School name", founding: "Founding", type: "Type", region: "Region", address: "Address", homepage: "Homepage", reason: "Why recommended", keywords: "Public keywords", status: "Status" },
+          detailStatus: "Shown after checking the latest NEIS info.",
+          noHomepage: "No homepage",
+          openHomepage: "Open homepage",
+          noSchool: "Select a school.",
+          noInfo: "No info",
+          noAddress: "No address",
+          searchEmpty: "No results. Try changing the school name, city/province, district, or address.",
+          searchDataLabel: "Public data",
+          missingCity: "No city/province info",
+          missingDistrict: "No district info",
+          summaryEmpty: "Choose filters to narrow down high schools quickly.",
+          summaryFiltered: "filtering by",
+          summaryHint: "Selecting a city/province will narrow the district list automatically.",
+          summaryCount: "results left.",
+          resultDetails: "Details",
+          matchLabel: "match",
+          themeLight: "Switch to light mode",
+          themeDark: "Switch to dark mode",
+          location: {
+            prompt: "Press the button to check.",
+            coords: "-",
+            city: "-",
+            district: "-",
+            count: "-",
+            hint: "The list narrows automatically after location is read.",
+            checking: "Checking current location...",
+            checkingStatus: "Checking",
+            doneStatus: "Done",
+            failStatus: "Failed",
+            success: "Found your current area.",
+            noSupport: "This browser does not support location.",
+            fail: "Location was read, but detailed area name could not be resolved.",
+            cityHint: (city) => `The school list is now aligned to ${city}.`,
+            countHint: "Your local school count appears after location is found.",
+          },
+          searchSummaryPrefix: "Query",
+          searchSummaryCity: "City/province",
+          searchSummaryDistrict: "District",
+          searchSummaryFounding: "Founding",
+          searchSummaryBuilding: "applied as filters.",
+          searchSummaryNoSelection: "All cities/provinces",
+          searchSummaryAllDistricts: "All districts",
+          searchSummaryAllFounding: "All founding types",
+          infoToast: "The extra analysis screen was removed. Only student recommendations remain.",
+          initDetail: "Enter answers to see detailed explanations.",
+          emptyResultSummary: "Enter answers to see recommendations.",
+        },
+        ja: {
+          detailFields: { name: "学校名", founding: "設立区分", type: "学校種別", region: "地域", address: "住所", homepage: "ホームページ", reason: "おすすめ理由", keywords: "公開キーワード", status: "状態" },
+          detailStatus: "NEIS の最新情報を確認して表示します。",
+          noHomepage: "ホームページなし",
+          openHomepage: "ホームページを開く",
+          noSchool: "学校を選んでください。",
+          noInfo: "情報なし",
+          noAddress: "住所なし",
+          searchEmpty: "検索結果がありません。学校名、都道府県/市道、区、住所を変えて再検索してください。",
+          searchDataLabel: "公的データ",
+          missingCity: "市道情報なし",
+          missingDistrict: "行政区情報なし",
+          summaryEmpty: "条件を選ぶと全国の高校をすばやく絞れます。",
+          summaryFiltered: "条件で絞り込み中です。",
+          summaryHint: "市道を選ぶと行政区の一覧が自動で絞られます。",
+          summaryCount: "件が残っています。",
+          resultDetails: "詳細を見る",
+          matchLabel: "一致",
+          themeLight: "ライトモードに切り替え",
+          themeDark: "ダークモードに切り替え",
+          location: {
+            prompt: "ボタンを押して確認してください。",
+            coords: "-",
+            city: "-",
+            district: "-",
+            count: "-",
+            hint: "位置を読み取ると自動で絞り込まれます。",
+            checking: "現在地を確認中です。",
+            checkingStatus: "確認中",
+            doneStatus: "完了",
+            failStatus: "失敗",
+            success: "現在地と地域を見つけました。",
+            noSupport: "このブラウザは位置情報に対応していません。",
+            fail: "位置は取得できましたが、詳細地域名は取得できませんでした。",
+            cityHint: (city) => `現在 ${city} を基準に学校一覧を調整しました。`,
+            countHint: "現在地を取得すると地域の学校数が表示されます。",
+          },
+          searchSummaryPrefix: "検索語",
+          searchSummaryCity: "市道",
+          searchSummaryDistrict: "行政区",
+          searchSummaryFounding: "設立区分",
+          searchSummaryBuilding: "で絞り込み中です。",
+          searchSummaryNoSelection: "市道 全体",
+          searchSummaryAllDistricts: "行政区 全体",
+          searchSummaryAllFounding: "設立区分 全体",
+          infoToast: "補助分析画面は削除しました。学生向け推薦のみ残しました。",
+          initDetail: "回答を入力すると詳細説明が表示されます。",
+          emptyResultSummary: "回答を入力するとおすすめ結果が表示されます。",
+        },
+        zh: {
+          detailFields: { name: "学校名称", founding: "办学类型", type: "学校类型", region: "地区", address: "地址", homepage: "主页", reason: "推荐原因", keywords: "公开关键词", status: "状态" },
+          detailStatus: "确认 NEIS 最新信息后显示。",
+          noHomepage: "没有主页",
+          openHomepage: "打开主页",
+          noSchool: "请选择学校。",
+          noInfo: "无信息",
+          noAddress: "无地址",
+          searchEmpty: "没有搜索结果。请更改学校名称、省市/区、地址后重新搜索。",
+          searchDataLabel: "公共数据",
+          missingCity: "无省市信息",
+          missingDistrict: "无行政区信息",
+          summaryEmpty: "选择筛选条件后，可以快速缩小全国高中范围。",
+          summaryFiltered: "正在按条件筛选。",
+          summaryHint: "选择市道后，行政区列表会自动缩小。",
+          summaryCount: "个结果剩余。",
+          resultDetails: "查看详情",
+          matchLabel: "匹配",
+          themeLight: "切换到浅色模式",
+          themeDark: "切换到深色模式",
+          location: {
+            prompt: "按下按钮进行确认。",
+            coords: "-",
+            city: "-",
+            district: "-",
+            count: "-",
+            hint: "读取位置后会自动缩小范围。",
+            checking: "正在确认当前位置。",
+            checkingStatus: "确认中",
+            doneStatus: "完成",
+            failStatus: "失败",
+            success: "已找到当前位置和区域。",
+            noSupport: "此浏览器不支持定位。",
+            fail: "已读取位置，但无法获取详细地区名。",
+            cityHint: (city) => `当前已按 ${city} 调整学校列表。`,
+            countHint: "获取当前位置后会显示该地区学校数量。",
+          },
+          searchSummaryPrefix: "搜索词",
+          searchSummaryCity: "市道",
+          searchSummaryDistrict: "行政区",
+          searchSummaryFounding: "办学类型",
+          searchSummaryBuilding: "进行筛选。",
+          searchSummaryNoSelection: "市道全部",
+          searchSummaryAllDistricts: "行政区全部",
+          searchSummaryAllFounding: "办学类型全部",
+          infoToast: "已移除附加分析页面，仅保留学生推荐。",
+          initDetail: "输入答案后会显示详细说明。",
+          emptyResultSummary: "输入答案后会显示推荐结果。",
+        },
+      };
+      return packs[lang] || packs.ko;
+    }
+
+    function translateFounding(value) {
+      const lang = state.language;
+      const map = {
+        ko: { 공립: "공립", 사립: "사립" },
+        en: { 공립: "Public", 사립: "Private" },
+        ja: { 공립: "公立", 사립: "私立" },
+        zh: { 공립: "公立", 사립: "私立" },
+      };
+      return (map[lang] && map[lang][value]) || value;
+    }
+
+    function translateSchoolType(value) {
+      const lang = state.language;
+      const map = {
+        ko: { 일반고: "일반고", 외국어고: "외국어고", 국제고: "국제고", 과학고: "과학고", 예술고: "예술고", 특성화고: "특성화고", 마이스터고: "마이스터고" },
+        en: { 일반고: "General", 외국어고: "Foreign language", 국제고: "International", 과학고: "Science", 예술고: "Arts", 특성화고: "Specialized", 마이스터고: "Meister" },
+        ja: { 일반고: "普通高校", 외국어고: "外国語", 국제고: "国際", 과학고: "科学", 예술고: "芸術", 특성화고: "専門", 마이스터고: "マイスター" },
+        zh: { 일반고: "普通高中", 외국어고: "外语", 국제고: "国际", 과학고: "科学", 예술고: "艺术", 특성화고: "专门", 마이스터고: "Meister" },
+      };
+      return (map[lang] && map[lang][value]) || value;
     }
 
     function normalize(v) {
@@ -640,17 +1246,19 @@
 
     function homepageMarkup(url) {
       const safeUrl = normalizeHomepageUrl(url);
-      if (!safeUrl) return '<span class="muted">홈페이지 없음</span>';
+      const L = getUiLabels(state.language);
+      if (!safeUrl) return `<span class="muted">${L.noHomepage}</span>`;
       const text = safeUrl.replace(/^https?:\/\//i, "");
       return `<a class="homepage-link" href="${safeUrl}" target="_blank" rel="noopener noreferrer">${text}</a>`;
     }
 
     function homepageButtonMarkup(url) {
       const safeUrl = normalizeHomepageUrl(url);
+      const L = getUiLabels(state.language);
       if (!safeUrl) {
-        return `<span class="school-btn home-ghost-btn" aria-disabled="true" style="opacity:.45;cursor:not-allowed;">홈페이지 없음</span>`;
+        return `<span class="school-btn home-ghost-btn" aria-disabled="true" style="opacity:.45;cursor:not-allowed;">${L.noHomepage}</span>`;
       }
-      return `<a class="school-btn home-ghost-btn" href="${safeUrl}" target="_blank" rel="noopener noreferrer">홈페이지 열기</a>`;
+      return `<a class="school-btn home-ghost-btn" href="${safeUrl}" target="_blank" rel="noopener noreferrer">${L.openHomepage}</a>`;
     }
 
     const NEIS_OFFICE_CODES = {
@@ -733,48 +1341,60 @@
     }
 
     function renderSchoolDetail(school, scored) {
-      const schoolName = school?.name || "학교를 선택하세요.";
-      const schoolFounding = school?.founding || "정보 없음";
-      const schoolType = school?.type || "정보 없음";
-      const schoolDistrict = school?.district || "정보 없음";
-      const schoolAddress = school?.address || "주소 없음";
+      const L = getUiLabels(state.language);
+      const schoolName = school?.name || L.noSchool;
+      const schoolFounding = school?.founding ? translateFounding(school.founding) : L.noInfo;
+      const schoolType = school?.type ? translateSchoolType(school.type) : L.noInfo;
+      const schoolDistrict = school?.district || L.noInfo;
+      const schoolAddress = school?.address || L.noAddress;
       const schoolKeywords = Array.isArray(school?.keywords) ? school.keywords : [];
+      const labels = L.detailFields;
       const detail = scored
         ? `
           <div class="detail-grid">
-            <div class="detail-item"><span>학교명</span><strong>${schoolName}</strong></div>
-            <div class="detail-item"><span>설립 구분</span><strong>${schoolFounding}</strong></div>
-            <div class="detail-item"><span>학교 유형</span><strong>${schoolType}</strong></div>
-            <div class="detail-item"><span>지역</span><strong>${schoolDistrict}</strong></div>
-            <div class="detail-item"><span>주소</span><strong>${schoolAddress}</strong></div>
-            <div class="detail-item"><span>홈페이지</span><strong>${homepageMarkup(school.homepageUrl || school.homepage)}</strong></div>
-            <div class="detail-item"><span>추천 이유</span><strong>${scored.reasons[0]}</strong></div>
-            <div class="detail-item"><span>공개 키워드</span><strong>${schoolKeywords.join(", ")}</strong></div>
+            <div class="detail-item"><span>${labels.name}</span><strong>${schoolName}</strong></div>
+            <div class="detail-item"><span>${labels.founding}</span><strong>${schoolFounding}</strong></div>
+            <div class="detail-item"><span>${labels.type}</span><strong>${schoolType}</strong></div>
+            <div class="detail-item"><span>${labels.region}</span><strong>${schoolDistrict}</strong></div>
+            <div class="detail-item"><span>${labels.address}</span><strong>${schoolAddress}</strong></div>
+            <div class="detail-item"><span>${labels.homepage}</span><strong>${homepageMarkup(school.homepageUrl || school.homepage)}</strong></div>
+            <div class="detail-item"><span>${labels.reason}</span><strong>${scored.reasons[0]}</strong></div>
+            <div class="detail-item"><span>${labels.keywords}</span><strong>${schoolKeywords.join(", ")}</strong></div>
           </div>
         `
         : `
           <div class="detail-grid">
-            <div class="detail-item"><span>학교명</span><strong>${schoolName}</strong></div>
-            <div class="detail-item"><span>설립 구분</span><strong>${schoolFounding}</strong></div>
-            <div class="detail-item"><span>학교 유형</span><strong>${schoolType}</strong></div>
-            <div class="detail-item"><span>지역</span><strong>${schoolDistrict}</strong></div>
-            <div class="detail-item"><span>주소</span><strong>${schoolAddress}</strong></div>
-            <div class="detail-item"><span>홈페이지</span><strong>${homepageMarkup(school.homepageUrl || school.homepage)}</strong></div>
-            <div class="detail-item"><span>상태</span><strong>NEIS 최신 정보 확인 후 표시됩니다.</strong></div>
-            <div class="detail-item"><span>공개 키워드</span><strong>${schoolKeywords.join(", ")}</strong></div>
+            <div class="detail-item"><span>${labels.name}</span><strong>${schoolName}</strong></div>
+            <div class="detail-item"><span>${labels.founding}</span><strong>${schoolFounding}</strong></div>
+            <div class="detail-item"><span>${labels.type}</span><strong>${schoolType}</strong></div>
+            <div class="detail-item"><span>${labels.region}</span><strong>${schoolDistrict}</strong></div>
+            <div class="detail-item"><span>${labels.address}</span><strong>${schoolAddress}</strong></div>
+            <div class="detail-item"><span>${labels.homepage}</span><strong>${homepageMarkup(school.homepageUrl || school.homepage)}</strong></div>
+            <div class="detail-item"><span>${labels.status}</span><strong>${L.detailStatus}</strong></div>
+            <div class="detail-item"><span>${labels.keywords}</span><strong>${schoolKeywords.join(", ")}</strong></div>
           </div>
         `;
       el("detail").innerHTML = detail;
     }
 
-    function setLocationView({ label = "버튼을 눌러 확인하세요.", coords = "-", city = "-", district = "-", count = "-", hint = "위치를 읽으면 자동으로 좁혀집니다.", status = "아직 확인 전" }) {
-      el("location-address").textContent = label;
-      el("location-coords").textContent = coords;
-      el("location-city").textContent = city;
-      el("location-district").textContent = district;
-      el("location-school-count").textContent = count;
-      el("location-hint").textContent = hint;
-      el("location-status").textContent = status;
+    function setLocationView({ label = "", coords = "", city = "", district = "", count = "", hint = "", status = "" }) {
+      const L = getUiLabels(state.language).location;
+      const values = {
+        label: label || L.prompt,
+        coords: coords || L.coords,
+        city: city || L.city,
+        district: district || L.district,
+        count: count || L.count,
+        hint: hint || L.hint,
+        status: status || L.checkingStatus,
+      };
+      el("location-address").textContent = values.label;
+      el("location-coords").textContent = values.coords;
+      el("location-city").textContent = values.city;
+      el("location-district").textContent = values.district;
+      el("location-school-count").textContent = values.count;
+      el("location-hint").textContent = values.hint;
+      el("location-status").textContent = values.status;
     }
 
     function pickAddressField(address, keys) {
@@ -793,7 +1413,7 @@
       return pickAddressField(address, ["name", "display_name"]) || "현재 위치를 찾았습니다.";
     }
 
-    async function resolveCurrentRegion(latitude, longitude) {
+    async function resolveCurrentRegion(latitude, longitude, L = getUiLabels(state.language).location) {
       try {
         const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(latitude)}&lon=${encodeURIComponent(longitude)}&accept-language=ko`;
         const response = await fetch(url, {
@@ -815,27 +1435,30 @@
         };
       } catch {
         return {
-          label: "현재 위치를 불러왔지만 상세 지역명은 가져오지 못했습니다.",
-          city: "정보 없음",
-          district: "정보 없음",
+          label: L.fail,
+          city: L.noInfo,
+          district: L.noInfo,
           raw: null,
         };
       }
     }
 
     async function locateCurrentArea() {
+      const L = getUiLabels(state.language).location;
       if (!navigator.geolocation) {
-        setLocationView({ status: "실패" });
-        showToast("이 브라우저는 위치 정보를 지원하지 않습니다.");
+        setLocationView({ label: L.prompt, coords: L.coords, city: L.city, district: L.district, count: L.count, hint: L.hint, status: L.failStatus });
+        showToast(L.noSupport);
         return;
       }
 
       setLocationView({
-        label: "현재 위치를 확인하는 중입니다.",
-        coords: "-",
-        city: "-",
-        district: "-",
-        status: "확인 중"
+        label: L.checking,
+        coords: L.coords,
+        city: L.city,
+        district: L.district,
+        count: L.count,
+        hint: L.hint,
+        status: L.checkingStatus
       });
 
       try {
@@ -849,9 +1472,9 @@
 
         const latitude = pos.coords.latitude;
         const longitude = pos.coords.longitude;
-        const region = await resolveCurrentRegion(latitude, longitude);
+        const region = await resolveCurrentRegion(latitude, longitude, L);
         const city = normalizeRegionName(region.city);
-        const district = region.district && region.district !== "정보 없음" ? region.district : "";
+        const district = region.district && region.district !== L.noInfo ? region.district : "";
 
         state.location = {
           latitude,
@@ -867,11 +1490,11 @@
         setLocationView({
           label: region.label,
           coords: `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`,
-          city: city || "정보 없음",
-          district: district || "정보 없음",
+          city: city || L.noInfo,
+          district: district || L.noInfo,
           count: city ? String(SCHOOLS.filter((school) => getSchoolCity(school) === city).length) : "-",
-          hint: city ? `현재 ${city} 기준으로 학교 목록이 맞춰졌습니다.` : "현재 위치를 찾으면 지역 학교 수가 표시됩니다.",
-          status: "완료"
+          hint: city ? L.cityHint(city) : L.countHint,
+          status: L.doneStatus
         });
 
         if (city) {
@@ -881,14 +1504,14 @@
           renderSearchList();
         }
 
-        showToast("현재 위치와 내 지역을 찾았습니다.");
+        showToast(L.success);
       } catch {
         state.location = null;
         state.locationLabel = "";
         state.locationCity = "";
         state.locationDistrict = "";
-        setLocationView({ count: "-", hint: "위치를 읽지 못했습니다.", status: "실패" });
-        showToast("위치 권한이 거부되었거나 위치를 읽을 수 없습니다.");
+        setLocationView({ label: L.prompt, coords: L.coords, city: L.city, district: L.district, count: L.count, hint: L.hint, status: L.failStatus });
+        showToast(L.fail);
       }
     }
 
@@ -917,27 +1540,29 @@
     }
 
     function updateSearchSummary(list) {
+      const L = getUiLabels(state.language);
       const total = SCHOOLS.length;
       const city = state.search.city;
       const district = state.search.district;
       const founding = state.search.founding;
       const activeFilters = [state.search.query, city, district, founding].filter(Boolean).length;
       const headline = activeFilters
-        ? `${list.length} / ${total}건이 남았습니다.`
-        : "검색 조건을 선택하면 전국 고등학교를 빠르게 좁힐 수 있습니다.";
+        ? `${list.length} / ${total} ${L.summaryCount}`
+        : L.summaryEmpty;
       const parts = [];
-      if (state.search.query) parts.push(`검색어 "${state.search.query}"`);
-      if (city) parts.push(`시도 ${city}`);
-      if (district) parts.push(`행정구 ${district}`);
-      if (founding) parts.push(`설립구분 ${founding}`);
+      if (state.search.query) parts.push(`${L.searchSummaryPrefix} "${state.search.query}"`);
+      if (city) parts.push(`${L.searchSummaryCity} ${city}`);
+      if (district) parts.push(`${L.searchSummaryDistrict} ${district}`);
+      if (founding) parts.push(`${L.searchSummaryFounding} ${translateFounding(founding)}`);
       const detail = parts.length
-        ? `${parts.join(" · ")} 기준으로 필터링 중입니다.`
-        : "시도 선택 시 행정구 목록이 자동으로 좁혀집니다.";
+        ? `${parts.join(" · ")} ${L.summaryFiltered}`
+        : L.summaryHint;
       el("search-summary").textContent = `${headline} ${detail}`;
       el("search-count").textContent = `${list.length} / ${total}`;
     }
 
     function populateSearchFilters() {
+      const t = UI_TEXT[state.language] || UI_TEXT.ko;
       const citySelect = el("search-city");
       const districtSelect = el("search-district");
       const foundingSelect = el("search-founding");
@@ -952,9 +1577,9 @@
       const cityCounts = new Map(cities.map((city) => [city, SCHOOLS.filter((school) => getSchoolCity(school) === city).length]));
       const districtCounts = new Map(filteredDistricts.map((district) => [district, SCHOOLS.filter((school) => (!selectedCity || getSchoolCity(school) === selectedCity) && school.district === district).length]));
 
-      citySelect.innerHTML = [`<option value=\"\">시도 전체</option>`, ...cities.map((city) => `<option value=\"${city}\">${city} (${cityCounts.get(city) || 0})</option>`)].join("");
-      districtSelect.innerHTML = [`<option value=\"\">행정구 전체</option>`, ...filteredDistricts.map((district) => `<option value=\"${district}\">${district} (${districtCounts.get(district) || 0})</option>`)].join("");
-      foundingSelect.innerHTML = [`<option value=\"\">설립구분 전체</option>`, ...foundings.map((founding) => `<option value=\"${founding}\">${founding}</option>`)].join("");
+      citySelect.innerHTML = [`<option value=\"\">${t.searchAllCity}</option>`, ...cities.map((city) => `<option value=\"${city}\">${city} (${cityCounts.get(city) || 0})</option>`)].join("");
+      districtSelect.innerHTML = [`<option value=\"\">${t.searchAllDistrict}</option>`, ...filteredDistricts.map((district) => `<option value=\"${district}\">${district} (${districtCounts.get(district) || 0})</option>`)].join("");
+      foundingSelect.innerHTML = [`<option value=\"\">${t.searchAllFounding}</option>`, ...foundings.map((founding) => `<option value=\"${founding}\">${translateFounding(founding)}</option>`)].join("");
 
       citySelect.value = selectedCity;
       districtSelect.value = state.search.district && filteredDistricts.includes(state.search.district) ? state.search.district : "";
@@ -988,7 +1613,10 @@
 
     function renderQuestions() {
       const grid = el("quiz-grid");
-      grid.innerHTML = QUESTIONS.map((q, index) => {
+      const localizedQuestions = getLocalizedQuestions(state.language);
+      const quizHelp = UI_TEXT[state.language]?.quizHelp || UI_TEXT.ko.quizHelp;
+      const clearLabel = UI_TEXT[state.language]?.clearQuestion || UI_TEXT.ko.clearQuestion;
+      grid.innerHTML = localizedQuestions.map((q, index) => {
         const current = state.answers[q.id] || "";
         return `
           <article class="q-card" data-qid="${q.id}">
@@ -1009,9 +1637,9 @@
             </div>
             <div class="q-input-row">
               <input class="q-input" data-input="${q.id}" placeholder="${q.placeholder}" value="${current}" maxlength="16" />
-              <button type="button" class="chip-btn" data-clear="${q.id}">지우기</button>
+              <button type="button" class="chip-btn" data-clear="${q.id}">${clearLabel}</button>
             </div>
-            <div class="q-help">직접 ${q.options.map(o => o.key).join("/")} 중 하나를 입력해도 되고, 아래 버튼을 눌러도 됩니다.</div>
+            <div class="q-help">${quizHelp}</div>
           </article>
         `;
       }).join("");
@@ -1102,6 +1730,52 @@
       return { school, score: Math.max(0, Math.min(100, Math.round(score))), reasons };
     }
 
+    function renderRecommendations(scored) {
+      const t = UI_TEXT[state.language] || UI_TEXT.ko;
+      const L = getUiLabels(state.language);
+      const list = Array.isArray(scored) ? scored : [];
+      el("match-pill").textContent = list[0] ? `${list[0].score}% ${L.matchLabel}` : t.waiting;
+      el("result-summary").textContent = t.resultSummary;
+
+      el("results").innerHTML = list.map((item, idx) => `
+        <article class="school-card">
+          <div class="school-top">
+            <div>
+              <h3 class="school-name">${idx + 1}. ${item.school.name}</h3>
+              <div class="school-meta">${item.school.district} · ${translateSchoolType(item.school.type)} · ${translateFounding(item.school.founding)}</div>
+            </div>
+            <div class="school-score">${item.score}%</div>
+          </div>
+          <div class="tag-row">
+            <span class="tag">${translateSchoolType(item.school.type)}</span>
+            <span class="tag gray">${translateFounding(item.school.founding)}</span>
+            <span class="tag gray">${item.school.district}</span>
+          </div>
+          <p class="panel-sub" style="margin-top:12px">${item.reasons[0]}</p>
+          <ul class="reason-list">
+            ${item.reasons.slice(0, 3).map(r => `<li>${r}</li>`).join("")}
+          </ul>
+          <div class="school-actions">
+            <button class="school-btn home-ghost-btn" data-detail="${item.school.name}">${L.resultDetails}</button>
+            ${homepageButtonMarkup(item.school.homepageUrl || item.school.homepage)}
+          </div>
+        </article>
+      `).join("");
+
+      renderSchoolDetail(list[0]?.school || {}, list[0] || null);
+      state.selectedSchool = list[0]?.school || null;
+
+      document.querySelectorAll("[data-detail]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const school = list.find((s) => s.school.name === btn.dataset.detail);
+          if (!school) return;
+          state.selectedSchool = school.school;
+          renderSchoolDetail(school.school, school);
+          window.scrollTo({ top: document.getElementById("detail-panel").offsetTop - 8, behavior: "smooth" });
+        });
+      });
+    }
+
     async function calculate() {
       const answers = enrichedAnswers();
       const ranked = SCHOOLS.map((school) => scoreSchool(school, answers)).sort((a, b) => b.score - a.score);
@@ -1113,66 +1787,28 @@
         if (confirmed.length === 3) break;
       }
       const scored = confirmed.length ? confirmed : ranked.slice(0, 3);
-      el("match-pill").textContent = scored[0] ? `${scored[0].score}% 매칭` : "대기 중";
-      el("result-summary").textContent = "공공데이터에서 확인 가능한 정보만 사용해 상위 3개를 골랐습니다.";
-
-      el("results").innerHTML = scored.map((item, idx) => `
-        <article class="school-card">
-          <div class="school-top">
-            <div>
-              <h3 class="school-name">${idx + 1}. ${item.school.name}</h3>
-              <div class="school-meta">${item.school.district} · ${item.school.type} · ${item.school.founding}</div>
-            </div>
-            <div class="school-score">${item.score}%</div>
-          </div>
-          <div class="tag-row">
-            <span class="tag">${item.school.type}</span>
-            <span class="tag gray">${item.school.founding}</span>
-            <span class="tag gray">${item.school.district}</span>
-          </div>
-          <p class="panel-sub" style="margin-top:12px">${item.reasons[0]}</p>
-          <ul class="reason-list">
-            ${item.reasons.slice(0, 3).map(r => `<li>${r}</li>`).join("")}
-          </ul>
-          <div class="school-actions">
-            <button class="school-btn home-ghost-btn" data-detail="${item.school.name}">상세 보기</button>
-            ${homepageButtonMarkup(item.school.homepageUrl || item.school.homepage)}
-          </div>
-        </article>
-      `).join("");
-
-      renderSchoolDetail(scored[0]?.school || {}, scored[0] || null);
-      state.selectedSchool = scored[0]?.school || null;
-
-      document.querySelectorAll("[data-detail]").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          const school = scored.find((s) => s.school.name === btn.dataset.detail);
-          if (!school) return;
-          state.selectedSchool = school.school;
-          renderSchoolDetail(school.school, school);
-          window.scrollTo({ top: document.getElementById("detail-panel").offsetTop - 8, behavior: "smooth" });
-        });
-      });
-
+      state.lastRecommendations = scored;
+      renderRecommendations(scored);
       closeSurvey();
       setSection("result-panel");
     }
 
     function renderSearchList() {
+      const L = getUiLabels(state.language);
       const list = getFilteredSchools();
       const wrap = el("search-results");
       updateSearchSummary(list);
       if (!list.length) {
-        wrap.innerHTML = `<div class="stat-card">검색 결과가 없습니다. 학교 이름, 시도, 행정구, 주소를 바꿔서 다시 검색해 보세요.</div>`;
+        wrap.innerHTML = `<div class="stat-card">${L.searchEmpty}</div>`;
         return;
       }
       wrap.innerHTML = list.map(({ school, index }) => `
         <div class="search-item" data-search-index="${index}">
           <div class="left">
             <div class="name">${school.name}</div>
-            <div class="meta">${getSchoolCity(school) || "시도 정보 없음"} · ${school.district || "행정구 정보 없음"} · ${school.type} · ${school.founding}</div>
+            <div class="meta">${getSchoolCity(school) || L.missingCity} · ${school.district || L.missingDistrict} · ${translateSchoolType(school.type)} · ${translateFounding(school.founding)}</div>
           </div>
-          <div class="dist">공공데이터</div>
+          <div class="dist">${L.searchDataLabel}</div>
         </div>
       `).join("");
       wrap.querySelectorAll("[data-search-index]").forEach((item) => {
@@ -1193,12 +1829,13 @@
     }
 
     function clearQuiz() {
+      const t = UI_TEXT[state.language] || UI_TEXT.ko;
       state.answers = { gender: "", type: "", priority: "", founding: "", region: "", distance: "", study: "", activity: "", major: "", occupation: "", keyword: "", note: "" };
       renderQuestions();
       el("results").innerHTML = "";
-      el("detail").innerHTML = `<div class="stat-card">질문을 입력하면 상세 설명이 나타납니다.</div>`;
-      el("match-pill").textContent = "대기 중";
-      el("result-summary").textContent = "질문을 입력하면 추천 결과가 표시됩니다.";
+      el("detail").innerHTML = `<div class="stat-card">${t.detailEmpty}</div>`;
+      el("match-pill").textContent = t.waiting;
+      el("result-summary").textContent = t.resultEmpty;
       updateQuizProgress();
     }
 
@@ -1207,12 +1844,15 @@
     }
 
     initTheme();
+    initLayoutMode();
+    const storedLanguage = localStorage.getItem(LANGUAGE_KEY) || (navigator.language?.startsWith("en") ? "en" : navigator.language?.startsWith("ja") ? "ja" : navigator.language?.startsWith("zh") ? "zh" : "ko");
+    applyLanguage(storedLanguage, false);
     populateSearchFilters();
     el("school-count").textContent = String(SCHOOLS.length);
     setLocationView({});
     renderQuestions();
     renderSearchList();
-    el("detail").innerHTML = `<div class="stat-card">질문을 입력하면 상세 설명이 나타납니다.</div>`;
+    el("detail").innerHTML = `<div class="stat-card">${getUiLabels(state.language).initDetail}</div>`;
 
     el("start-quiz").addEventListener("click", openSurvey);
     el("start-quiz-inline").addEventListener("click", openSurvey);
@@ -1227,6 +1867,16 @@
     el("theme-toggle").addEventListener("click", () => {
       const current = document.body.getAttribute("data-theme") === "dark" ? "dark" : "light";
       setTheme(current === "dark" ? "light" : "dark");
+    });
+    document.querySelectorAll("[data-layout]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        applyLayoutMode(btn.dataset.layout, true);
+      });
+    });
+    document.querySelectorAll("[data-lang]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        applyLanguage(btn.dataset.lang, true);
+      });
     });
     el("search-input").addEventListener("input", (e) => {
       state.search.query = e.target.value.trim();
@@ -1252,7 +1902,7 @@
       populateSearchFilters();
       renderSearchList();
     });
-    el("btn-info").addEventListener("click", () => showToast("부가 분석 화면은 제거했습니다. 학생 추천만 남겼습니다."));
+    el("btn-info").addEventListener("click", () => showToast(getUiLabels(state.language).infoToast));
     el("btn-location").addEventListener("click", locateCurrentArea);
     document.querySelectorAll(".bnav-item").forEach((item) => {
       item.addEventListener("click", () => {

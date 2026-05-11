@@ -40,3 +40,32 @@
 ```bash
 node scripts/prepare-high-schools.mjs "data/high_schools_source.csv" "data/high_schools.csv"
 ```
+
+## 자율형 오퍼레이터
+
+로컬 자동화 브리지와 연결되는 프롬프트 기반 실행기는 `scripts/cursor-autonomy.mjs`에 있습니다.
+
+```bash
+node scripts/cursor-autonomy.mjs --prompt "browser: navigate https://example.com"
+node scripts/cursor-autonomy.mjs --prompt "system: createFolder C:\\Temp\\CursorDemo" --dry-run
+node scripts/cursor-autonomy.mjs --status
+```
+
+지원하는 기본 디렉티브는 다음과 같습니다.
+
+- `browser: navigate <url>`
+- `browser: click <selector>`
+- `browser: fill <selector> = <value>`
+- `system: createFolder <path>`
+- `system: runCommand <command>`
+- `ui: activateWindow <title>`
+- `ui: keys <key combo>`
+- Safe app launches such as `msedge` are allowlisted in `~/.cursor/automation/automation.json`.
+
+## Persistent Memory
+
+The operator reads and updates both global memory files under `~/.cursor/` and project-local memory files under `.cursor/`.
+
+- `USER.md` stores durable user preferences and UI/UX style.
+- `MEMORY.md` stores stable facts, decisions, workflows, and short run summaries.
+- Repo-local memory overrides global memory when the two disagree.
