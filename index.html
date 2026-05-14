@@ -93,10 +93,11 @@
     .q-title{font-size:1.04rem;font-weight:800;margin:0 0 4px}
     .q-desc{margin:0;color:var(--muted);font-size:.92rem;line-height:1.6}
     .q-options{display:grid;gap:8px;margin-top:14px}
-    .opt-btn{justify-content:flex-start;position:relative;padding:12px 42px 12px 14px;border-radius:14px;background:#fff}
+    .opt-btn{justify-content:flex-start;gap:10px;padding:12px 14px;border-radius:14px;background:#fff}
     .opt-btn.active{border-color:rgba(29,158,117,.55);background:rgba(29,158,117,.08)}
     .opt-letter{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:10px;background:#eff6f2;color:var(--brand-ink);font-weight:800;margin-right:8px}
-    .opt-check{position:absolute;right:14px;top:50%;transform:translateY(-50%);display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:9px;background:transparent;color:transparent;font-weight:900;font-size:16px;transition:all .15s ease}
+    .opt-text{flex:1;min-width:0}
+    .opt-check{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:8px;background:transparent;color:transparent;font-weight:900;font-size:15px;transition:all .15s ease;flex:0 0 auto}
     .opt-btn.active .opt-check{background:#ffffff;color:var(--danger);border:1px solid rgba(239,68,68,.22);box-shadow:0 2px 8px rgba(239,68,68,.14)}
     .q-input-row{display:flex;gap:10px;margin-top:12px}
     .q-input{flex:1;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:#fff;outline:none}
@@ -418,23 +419,30 @@
       { name: "경기모바일과학고등학교", district: "안산시", founding: "공립", type: "특성화고", tags: ["소프트웨어", "디지털"], distance: 0, keywords: ["소프트웨어", "디지털", "IT"] },
     ];
 
-    const buildSchoolProfile = (school) => ({
-      ...school,
-      tags: Array.isArray(school.tags) && school.tags.length
-        ? school.tags
-        : [school.type, school.founding, school.district].filter(Boolean),
-      keywords: Array.isArray(school.keywords) && school.keywords.length
-        ? school.keywords
-        : [school.type, school.detailType, school.city, school.district, school.founding, school.gender].filter(Boolean),
-      searchText: normalize([school.name, school.city, school.sido, school.district, school.founding, school.type, school.address, school.phone, school.homepage].join(" ")),
-      scoreText: normalize([school.name, school.city, school.sido, school.district, school.founding, school.type, school.address, school.tags?.join(" "), school.keywords?.join(" ")].join(" ")),
-      homepageUrl: normalizeHomepageUrl(school.homepage),
-    });
+    const buildSchoolProfile = (school) => {
+      const cityValue = normalizeRegionName(school.city || school.sido || school.region || school.province || school.cityName || "");
+      return {
+        ...school,
+        cityValue,
+        tags: Array.isArray(school.tags) && school.tags.length
+          ? school.tags
+          : [school.type, school.founding, school.district].filter(Boolean),
+        keywords: Array.isArray(school.keywords) && school.keywords.length
+          ? school.keywords
+          : [school.type, school.detailType, school.city, school.district, school.founding, school.gender].filter(Boolean),
+        searchText: normalize([school.name, school.city, school.sido, school.district, school.founding, school.type, school.address, school.phone, school.homepage].join(" ")),
+        scoreText: normalize([school.name, school.city, school.sido, school.district, school.founding, school.type, school.address, school.tags?.join(" "), school.keywords?.join(" ")].join(" ")),
+        homepageUrl: normalizeHomepageUrl(school.homepage),
+      };
+    };
 
     const SCHOOLS = (Array.isArray(window.NATIONAL_HIGH_SCHOOLS) && window.NATIONAL_HIGH_SCHOOLS.length
       ? window.NATIONAL_HIGH_SCHOOLS
       : DEMO_SCHOOLS
     ).map(buildSchoolProfile);
+    const QUESTION_TEXT_CACHE = new Map();
+    const SCHOOL_CITIES = uniqueSorted(SCHOOLS.map((school) => school.cityValue || ""));
+    const SCHOOL_FOUNDINGS = uniqueSorted(SCHOOLS.map((school) => school.founding || ""));
 
     const QUESTIONS = [
       {
@@ -892,8 +900,9 @@
     }
 
     function getLocalizedQuestions(lang) {
+      if (QUESTION_TEXT_CACHE.has(lang)) return QUESTION_TEXT_CACHE.get(lang);
       const locale = QUESTION_I18N[lang] || QUESTION_I18N.ko;
-      return QUESTIONS.map((question) => {
+      const localized = QUESTIONS.map((question) => {
         const patch = locale[question.id] || {};
         return {
           ...question,
@@ -906,6 +915,8 @@
           })),
         };
       });
+      QUESTION_TEXT_CACHE.set(lang, localized);
+      return localized;
     }
 
     function applyLanguage(lang, persist = true) {
@@ -1520,7 +1531,7 @@
     }
 
     function getSchoolCity(school) {
-      return school.city || school.sido || school.region || school.province || school.cityName || "";
+      return school.cityValue || school.city || school.sido || school.region || school.province || school.cityName || "";
     }
 
     function getFilteredSchools() {
@@ -1566,16 +1577,16 @@
       const citySelect = el("search-city");
       const districtSelect = el("search-district");
       const foundingSelect = el("search-founding");
-      const cities = uniqueSorted(SCHOOLS.map((school) => getSchoolCity(school)));
-      const foundings = uniqueSorted(SCHOOLS.map((school) => school.founding));
+      const cities = SCHOOL_CITIES;
+      const foundings = SCHOOL_FOUNDINGS;
       const selectedCity = state.search.city;
       const filteredDistricts = uniqueSorted(
         SCHOOLS
-          .filter((school) => !selectedCity || getSchoolCity(school) === selectedCity)
+          .filter((school) => !selectedCity || school.cityValue === selectedCity)
           .map((school) => school.district)
       );
-      const cityCounts = new Map(cities.map((city) => [city, SCHOOLS.filter((school) => getSchoolCity(school) === city).length]));
-      const districtCounts = new Map(filteredDistricts.map((district) => [district, SCHOOLS.filter((school) => (!selectedCity || getSchoolCity(school) === selectedCity) && school.district === district).length]));
+      const cityCounts = new Map(cities.map((city) => [city, SCHOOLS.filter((school) => school.cityValue === city).length]));
+      const districtCounts = new Map(filteredDistricts.map((district) => [district, SCHOOLS.filter((school) => (!selectedCity || school.cityValue === selectedCity) && school.district === district).length]));
 
       citySelect.innerHTML = [`<option value=\"\">${t.searchAllCity}</option>`, ...cities.map((city) => `<option value=\"${city}\">${city} (${cityCounts.get(city) || 0})</option>`)].join("");
       districtSelect.innerHTML = [`<option value=\"\">${t.searchAllDistrict}</option>`, ...filteredDistricts.map((district) => `<option value=\"${district}\">${district} (${districtCounts.get(district) || 0})</option>`)].join("");
@@ -1630,7 +1641,8 @@
             <div class="q-options">
               ${q.options.map(opt => `
                 <button type="button" class="opt-btn ${current === opt.value ? "active" : ""}" data-set="${q.id}" data-value="${opt.value}">
-                  <span class="opt-letter">${opt.key}</span>${opt.label}
+                  <span class="opt-letter">${opt.key}</span>
+                  <span class="opt-text">${opt.label}</span>
                   <span class="opt-check" aria-hidden="true">${current === opt.value ? "✓" : ""}</span>
                 </button>
               `).join("")}
@@ -1643,35 +1655,40 @@
           </article>
         `;
       }).join("");
-
       updateQuizProgress();
+    }
 
-      grid.querySelectorAll("[data-set]").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          const id = btn.dataset.set;
-          state.answers[id] = btn.dataset.value;
+    function bindQuizEvents() {
+      const grid = el("quiz-grid");
+      if (!grid || grid.dataset.bound === "true") return;
+      grid.dataset.bound = "true";
+
+      grid.addEventListener("click", (e) => {
+        const setBtn = e.target.closest("[data-set]");
+        if (setBtn) {
+          state.answers[setBtn.dataset.set] = setBtn.dataset.value;
           renderQuestions();
-        });
+          return;
+        }
+        const clearBtn = e.target.closest("[data-clear]");
+        if (clearBtn) {
+          state.answers[clearBtn.dataset.clear] = "";
+          renderQuestions();
+        }
       });
 
-      grid.querySelectorAll("[data-clear]").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          state.answers[btn.dataset.clear] = "";
-          renderQuestions();
-        });
+      grid.addEventListener("input", (e) => {
+        const input = e.target.closest("[data-input]");
+        if (!input) return;
+        state.answers[input.dataset.input] = input.value.trim();
+        updateQuizProgress();
       });
 
-      grid.querySelectorAll("[data-input]").forEach((input) => {
-        input.addEventListener("input", (e) => {
-          state.answers[e.target.dataset.input] = e.target.value.trim();
-          updateQuizProgress();
-        });
-        input.addEventListener("keydown", (e) => {
-          if (e.key === "Enter") {
-            e.preventDefault();
-            calculate();
-          }
-        });
+      grid.addEventListener("keydown", (e) => {
+        const input = e.target.closest("[data-input]");
+        if (!input || e.key !== "Enter") return;
+        e.preventDefault();
+        calculate();
       });
     }
 
@@ -1811,20 +1828,26 @@
           <div class="dist">${L.searchDataLabel}</div>
         </div>
       `).join("");
-      wrap.querySelectorAll("[data-search-index]").forEach((item) => {
-        item.addEventListener("click", () => {
-          const school = SCHOOLS[Number(item.dataset.searchIndex)];
-          if (!school) return;
-          state.selectedSchool = school;
-          renderSchoolDetail(school, null);
-          void fetchLiveSchoolData(school).then((liveSchool) => {
-            if (!liveSchool) return;
-            if (state.selectedSchool && state.selectedSchool.name === school.name) {
-              renderSchoolDetail(liveSchool, null);
-            }
-          });
-          window.scrollTo({ top: document.getElementById("detail-panel").offsetTop - 8, behavior: "smooth" });
+    }
+
+    function bindSearchEvents() {
+      const wrap = el("search-results");
+      if (!wrap || wrap.dataset.bound === "true") return;
+      wrap.dataset.bound = "true";
+      wrap.addEventListener("click", (e) => {
+        const item = e.target.closest("[data-search-index]");
+        if (!item) return;
+        const school = SCHOOLS[Number(item.dataset.searchIndex)];
+        if (!school) return;
+        state.selectedSchool = school;
+        renderSchoolDetail(school, null);
+        void fetchLiveSchoolData(school).then((liveSchool) => {
+          if (!liveSchool) return;
+          if (state.selectedSchool && state.selectedSchool.name === school.name) {
+            renderSchoolDetail(liveSchool, null);
+          }
         });
+        window.scrollTo({ top: document.getElementById("detail-panel").offsetTop - 8, behavior: "smooth" });
       });
     }
 
@@ -1852,6 +1875,8 @@
     setLocationView({});
     renderQuestions();
     renderSearchList();
+    bindQuizEvents();
+    bindSearchEvents();
     el("detail").innerHTML = `<div class="stat-card">${getUiLabels(state.language).initDetail}</div>`;
 
     el("start-quiz").addEventListener("click", openSurvey);
