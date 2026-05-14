@@ -443,6 +443,26 @@
     const QUESTION_TEXT_CACHE = new Map();
     const SCHOOL_CITIES = uniqueSorted(SCHOOLS.map((school) => school.cityValue || ""));
     const SCHOOL_FOUNDINGS = uniqueSorted(SCHOOLS.map((school) => school.founding || ""));
+    const SCHOOL_CITY_COUNTS = new Map();
+    const SCHOOL_DISTRICTS_BY_CITY = new Map();
+    const SCHOOL_DISTRICT_COUNTS_BY_CITY = new Map();
+    const SCHOOL_ALL_DISTRICT_COUNTS = new Map();
+
+    SCHOOLS.forEach((school) => {
+      const city = school.cityValue || "";
+      const district = school.district || "";
+      if (city) SCHOOL_CITY_COUNTS.set(city, (SCHOOL_CITY_COUNTS.get(city) || 0) + 1);
+      if (!SCHOOL_DISTRICTS_BY_CITY.has(city)) {
+        SCHOOL_DISTRICTS_BY_CITY.set(city, new Set());
+        SCHOOL_DISTRICT_COUNTS_BY_CITY.set(city, new Map());
+      }
+      if (district) {
+        SCHOOL_ALL_DISTRICT_COUNTS.set(district, (SCHOOL_ALL_DISTRICT_COUNTS.get(district) || 0) + 1);
+        SCHOOL_DISTRICTS_BY_CITY.get(city).add(district);
+        const districtCounts = SCHOOL_DISTRICT_COUNTS_BY_CITY.get(city);
+        districtCounts.set(district, (districtCounts.get(district) || 0) + 1);
+      }
+    });
 
     const QUESTIONS = [
       {
@@ -604,6 +624,22 @@
       locationDistrict: ""
     };
     const el = (id) => document.getElementById(id);
+
+    function safeStorageGet(key, fallback = "") {
+      try {
+        return localStorage.getItem(key) || fallback;
+      } catch {
+        return fallback;
+      }
+    }
+
+    function safeStorageSet(key, value) {
+      try {
+        localStorage.setItem(key, value);
+      } catch {
+        /* Storage can be blocked in some browsers; the app still runs without persistence. */
+      }
+    }
 
     const THEME_KEY = "lfpy_theme";
     const LAYOUT_KEY = "lfpy_layout";
@@ -842,7 +878,7 @@
     function setTheme(theme) {
       const next = theme === "dark" ? "dark" : "light";
       document.body.setAttribute("data-theme", next);
-      localStorage.setItem(THEME_KEY, next);
+      safeStorageSet(THEME_KEY, next);
       const toggle = el("theme-toggle");
       if (toggle) {
         const L = getUiLabels(state.language);
@@ -854,7 +890,7 @@
     }
 
     function initTheme() {
-      const stored = localStorage.getItem(THEME_KEY);
+      const stored = safeStorageGet(THEME_KEY);
       const preferred = stored || (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
       setTheme(preferred);
     }
@@ -878,13 +914,13 @@
       const effective = getPreferredLayoutMode(next);
       document.body.setAttribute("data-ui", effective);
       document.body.dataset.layoutMode = next;
-      if (persist) localStorage.setItem(LAYOUT_KEY, next);
+      if (persist) safeStorageSet(LAYOUT_KEY, next);
       updateLayoutSwitch();
       return effective;
     }
 
     function initLayoutMode() {
-      const stored = localStorage.getItem(LAYOUT_KEY) || "auto";
+      const stored = safeStorageGet(LAYOUT_KEY, "auto");
       applyLayoutMode(stored, false);
       window.addEventListener("resize", () => {
         if (state.layoutMode === "auto") applyLayoutMode("auto", false);
@@ -924,7 +960,7 @@
       state.language = next;
       document.documentElement.lang = next;
       document.body.dataset.language = next;
-      if (persist) localStorage.setItem(LANGUAGE_KEY, next);
+      if (persist) safeStorageSet(LANGUAGE_KEY, next);
       updateLanguageSwitch();
       setTheme(document.body.getAttribute("data-theme") === "dark" ? "dark" : "light");
 
@@ -1580,15 +1616,15 @@
       const cities = SCHOOL_CITIES;
       const foundings = SCHOOL_FOUNDINGS;
       const selectedCity = state.search.city;
-      const filteredDistricts = uniqueSorted(
-        SCHOOLS
-          .filter((school) => !selectedCity || school.cityValue === selectedCity)
-          .map((school) => school.district)
-      );
-      const cityCounts = new Map(cities.map((city) => [city, SCHOOLS.filter((school) => school.cityValue === city).length]));
-      const districtCounts = new Map(filteredDistricts.map((district) => [district, SCHOOLS.filter((school) => (!selectedCity || school.cityValue === selectedCity) && school.district === district).length]));
+      const districtSet = selectedCity
+        ? (SCHOOL_DISTRICTS_BY_CITY.get(selectedCity) || new Set())
+        : new Set(SCHOOLS.map((school) => school.district).filter(Boolean));
+      const filteredDistricts = uniqueSorted([...districtSet]);
+      const districtCounts = selectedCity
+        ? (SCHOOL_DISTRICT_COUNTS_BY_CITY.get(selectedCity) || new Map())
+        : SCHOOL_ALL_DISTRICT_COUNTS;
 
-      citySelect.innerHTML = [`<option value=\"\">${t.searchAllCity}</option>`, ...cities.map((city) => `<option value=\"${city}\">${city} (${cityCounts.get(city) || 0})</option>`)].join("");
+      citySelect.innerHTML = [`<option value=\"\">${t.searchAllCity}</option>`, ...cities.map((city) => `<option value=\"${city}\">${city} (${SCHOOL_CITY_COUNTS.get(city) || 0})</option>`)].join("");
       districtSelect.innerHTML = [`<option value=\"\">${t.searchAllDistrict}</option>`, ...filteredDistricts.map((district) => `<option value=\"${district}\">${district} (${districtCounts.get(district) || 0})</option>`)].join("");
       foundingSelect.innerHTML = [`<option value=\"\">${t.searchAllFounding}</option>`, ...foundings.map((founding) => `<option value=\"${founding}\">${translateFounding(founding)}</option>`)].join("");
 
@@ -1698,11 +1734,16 @@
       return found ? found.value : value;
     }
 
+    function getQuestionOptions(id) {
+      return QUESTIONS.find((question) => question.id === id)?.options || [];
+    }
+
     function enrichedAnswers() {
       return {
-        type: getTypedChoice(state.answers.type, QUESTIONS[0].options),
-        priority: getTypedChoice(state.answers.priority, QUESTIONS[1].options),
-        founding: getTypedChoice(state.answers.founding, QUESTIONS[2].options),
+        type: getTypedChoice(state.answers.type, getQuestionOptions("type")),
+        priority: getTypedChoice(state.answers.priority, getQuestionOptions("priority")),
+        founding: getTypedChoice(state.answers.founding, getQuestionOptions("founding")),
+        occupation: getTypedChoice(state.answers.occupation, getQuestionOptions("occupation")),
         keyword: normalize(state.answers.keyword || "")
       };
     }
@@ -1773,7 +1814,7 @@
             ${item.reasons.slice(0, 3).map(r => `<li>${r}</li>`).join("")}
           </ul>
           <div class="school-actions">
-            <button class="school-btn home-ghost-btn" data-detail="${item.school.name}">${L.resultDetails}</button>
+            <button class="school-btn home-ghost-btn" data-result-detail="${idx}">${L.resultDetails}</button>
             ${homepageButtonMarkup(item.school.homepageUrl || item.school.homepage)}
           </div>
         </article>
@@ -1781,15 +1822,20 @@
 
       renderSchoolDetail(list[0]?.school || {}, list[0] || null);
       state.selectedSchool = list[0]?.school || null;
+    }
 
-      document.querySelectorAll("[data-detail]").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          const school = list.find((s) => s.school.name === btn.dataset.detail);
-          if (!school) return;
-          state.selectedSchool = school.school;
-          renderSchoolDetail(school.school, school);
-          window.scrollTo({ top: document.getElementById("detail-panel").offsetTop - 8, behavior: "smooth" });
-        });
+    function bindResultEvents() {
+      const results = el("results");
+      if (!results || results.dataset.bound === "true") return;
+      results.dataset.bound = "true";
+      results.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-result-detail]");
+        if (!btn) return;
+        const item = state.lastRecommendations[Number(btn.dataset.resultDetail)];
+        if (!item) return;
+        state.selectedSchool = item.school;
+        renderSchoolDetail(item.school, item);
+        window.scrollTo({ top: document.getElementById("detail-panel").offsetTop - 8, behavior: "smooth" });
       });
     }
 
@@ -1868,7 +1914,8 @@
 
     initTheme();
     initLayoutMode();
-    const storedLanguage = localStorage.getItem(LANGUAGE_KEY) || (navigator.language?.startsWith("en") ? "en" : navigator.language?.startsWith("ja") ? "ja" : navigator.language?.startsWith("zh") ? "zh" : "ko");
+    const browserLanguage = navigator.language?.startsWith("en") ? "en" : navigator.language?.startsWith("ja") ? "ja" : navigator.language?.startsWith("zh") ? "zh" : "ko";
+    const storedLanguage = safeStorageGet(LANGUAGE_KEY, browserLanguage);
     applyLanguage(storedLanguage, false);
     populateSearchFilters();
     el("school-count").textContent = String(SCHOOLS.length);
@@ -1876,6 +1923,7 @@
     renderQuestions();
     renderSearchList();
     bindQuizEvents();
+    bindResultEvents();
     bindSearchEvents();
     el("detail").innerHTML = `<div class="stat-card">${getUiLabels(state.language).initDetail}</div>`;
 
